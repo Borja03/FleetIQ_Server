@@ -2,12 +2,14 @@ package entities;
 
 import javax.persistence.*;
 import java.util.Date;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entidad JPA que representa un Envío.
  */
 @Entity
-@Table(name = "envios")
+@Table(name = "envios", schema="FleetIQ")
+@XmlRootElement
 public class Envio {
 
     @Id
