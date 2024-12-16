@@ -1,17 +1,21 @@
-package entities;
+package java.entitie;
 
+import java.entitie.Estado;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
+import static javax.persistence.CascadeType.ALL;
+import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entidad JPA que representa un Envío.
  */
 @Entity
-@Table(name = "envios", schema="FleetIQ")
+@Table(name = "envios", schema = "FleetIQ")
 @XmlRootElement
-public class Envio implements Serializable{
+public class Envio implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,17 +36,37 @@ public class Envio implements Serializable{
     @Column(name = "num_paquetes", nullable = true)
     private Integer numPaquetes;
 
-    @Column(name = "creador_envio", nullable = true, length = 100)
+    @Column(name = "creador_envio", nullable = true, length = 30)
     private String creadorEnvio;
 
     @Column(name = "ruta", length = 7)
     private String ruta;
 
-    @Column(name = "vehiculo", length = 50)
+    @Column(name = "vehiculo", length = 10)
     private String vehiculo;
 
-    // Getters y Setters
+    @ManyToOne(fetch = EAGER, cascade = ALL)
+    private List<PackageEntity> packageList;
 
+    public List<PackageEntity> getpackageList() {
+        return packageList;
+    }
+    
+    @ManyToOne(fetch = EAGER, cascade = ALL)
+    private List<Vehiculo> vehicleList;
+
+    public List<Vehiculo> getvehicleList() {
+        return vehicleList;
+    }
+    
+    @ManyToOne(fetch = EAGER, cascade = ALL)
+    private List<UserEntity> userList;
+
+    public List<UserEntity> getuserList() {
+        return userList;
+    }
+
+    // Getters y Setters
     public Integer getId() {
         return id;
     }

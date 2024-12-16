@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package entities;
+package java.entitie;
 
 /**
  *
@@ -11,12 +11,14 @@ package entities;
  */
 import javax.persistence.*;
 import java.util.Date;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entidad JPA que representa un Vehículo.
  */
 @Entity
-@Table(name = "vehiculos")
+@Table(name = "envios", schema="FleetIQ")
+@XmlRootElement
 public class Vehiculo {
 
     @Id
@@ -29,15 +31,15 @@ public class Vehiculo {
     @Column(name = "modelo", nullable = true, length = 50)
     private String modelo;
 
-    @Column(name = "capacidad", true = false)
+    @Column(name = "capacidad", nullable = true)
     private Integer capacidad;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_itv", true = false)
+    @Column(name = "fecha_itv", nullable = true)
     private Date fechaItv;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_matriculacion", nullable = false)
+    @Column(name = "fecha_matriculacion", nullable = true)
     private Date fechaMatriculacion;
 
     @Column(name = "activo", nullable = false)
