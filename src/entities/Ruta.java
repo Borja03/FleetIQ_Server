@@ -18,26 +18,27 @@ public class Ruta  implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer localizador;
 
-    @Column(name = "origen", nullable = false)
+    @Column(name = "origen", nullable = true)
     private String origen;
 
-    @Column(name = "destino", nullable = false)
+    @Column(name = "destino", nullable = true)
     private String destino;
 
-    @Column(name = "distancia", nullable = false)
+    @Column(name = "distancia", nullable = true)
     private Float distancia;
 
-    @Column(name = "tiempo", nullable = false)
+    @Temporal(TemporalType.DATE)
+    @Column(name = "tiempo", nullable = true)
     private Time tiempo;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_creacion", nullable = false)
+    @Column(name = "fecha_creacion", nullable = true)
     private Date fechaCreacion;
     
     @Column(name = "vehiculo", length = 50)
     private String vehiculo;
     
-    @Column(name = "num_vehiculos", nullable = false)
+    @Column(name = "num_vehiculos", nullable = true)
     private Integer numVehiculos;
 
   
