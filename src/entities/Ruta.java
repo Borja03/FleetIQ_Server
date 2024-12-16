@@ -4,12 +4,14 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Time;
 import java.util.Date;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entidad JPA que representa una ruta.
  */
 @Entity
-@Table(name = "ruta")
+@Table(name = "ruta", schema="FleetIQ")
+@XmlRootElement
 public class Ruta  implements Serializable{
 
     @Id
