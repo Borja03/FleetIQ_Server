@@ -7,23 +7,42 @@ package entitie;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import static javax.persistence.CascadeType.ALL;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import static javax.persistence.FetchType.EAGER;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Omar
  */
+
+@NamedQueries({
+   @NamedQuery(
+           name="findAllPackages",
+           query="SELECT * FROM package ORDER BY id"),
+   @NamedQuery(
+           name="findAllAccounts",
+           query="SELECT s FROM Account s ORDER BY s.id"
+   )
+})
+
 @Entity
-@Table(schema="retodb" ,name = "paquete")
-public class PaqueteEntity implements Serializable {
+@Table(schema="retodb" ,name = "package")
+@XmlRootElement
+public class PackageEntity implements Serializable {
     
     private static final long serialVersionUID = 1L;
     @Id
@@ -33,18 +52,26 @@ public class PaqueteEntity implements Serializable {
     private String receiver;
     private double weight;
     @Enumerated(EnumType.STRING)
-    private PaqueteSize size;
-    @Temporal(TemporalType.TIMESTAMP)
+    private PackageSize size;
+    @Temporal(TemporalType.DATE)
     private Date creationDate;
     private boolean fragile;
 
-    public PaqueteEntity() {
+    public PackageEntity() {
     }
 
+    @OneToMany(fetch=EAGER,cascade=ALL,mappedBy="package")
+   
+      private List<Envio> enviosList;
+     public List<Envio> getEnviosList() {
+        return enviosList;
+    }
+
+    public void setEnviosList(List<Envio> enviosList) {
+        this.enviosList = enviosList;
+    }
     
     
-    
-    // Getters and Setters
     public Long getId() {
         return id;
     }
@@ -94,14 +121,22 @@ public class PaqueteEntity implements Serializable {
         this.fragile = fragile;
     }
 
-    public PaqueteSize getSize() {
+    public PackageSize getSize() {
         return size;
     }
 
-    public void setSize(PaqueteSize size) {
+    public void setSize(PackageSize size) {
         this.size = size;
     }
 
+        @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    
     // Optional: toString() method for debugging
     @Override
     public String toString() {

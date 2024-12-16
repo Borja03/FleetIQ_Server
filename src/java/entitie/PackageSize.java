@@ -9,7 +9,7 @@ package entitie;
  *
  * @author Omar
  */
-public enum  PaqueteSize {
+public enum  PackageSize {
     SMALL,
     MEDIUM,
     LARGE,
