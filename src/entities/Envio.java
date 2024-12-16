@@ -1,5 +1,6 @@
 package entities;
 
+import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -10,14 +11,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "envios", schema="FleetIQ")
 @XmlRootElement
-public class Envio {
+public class Envio implements Serializable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_envio", nullable = false)
+    @Column(name = "fecha_envio", nullable = true)
     private Date fechaEnvio;
 
     @Temporal(TemporalType.DATE)
@@ -25,13 +26,13 @@ public class Envio {
     private Date fechaEntrega;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado", nullable = false)
+    @Column(name = "estado", nullable = true)
     private Estado estado;
 
-    @Column(name = "num_paquetes", nullable = false)
+    @Column(name = "num_paquetes", nullable = true)
     private Integer numPaquetes;
 
-    @Column(name = "creador_envio", nullable = false, length = 100)
+    @Column(name = "creador_envio", nullable = true, length = 100)
     private String creadorEnvio;
 
     @Column(name = "ruta", length = 7)
@@ -104,5 +105,10 @@ public class Envio {
 
     public void setVehiculo(String vehiculo) {
         this.vehiculo = vehiculo;
+    }
+
+    @Override
+    public String toString() {
+        return "Envio{" + "id=" + id + ", fechaEnvio=" + fechaEnvio + ", fechaEntrega=" + fechaEntrega + ", estado=" + estado + ", numPaquetes=" + numPaquetes + ", creadorEnvio=" + creadorEnvio + ", ruta=" + ruta + ", vehiculo=" + vehiculo + '}';
     }
 }
