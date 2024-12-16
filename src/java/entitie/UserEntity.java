@@ -60,7 +60,8 @@ public class UserEntity implements Serializable {
     private String street;
     private Integer zip;
     private boolean activo;
-
+   @Enumerated(EnumType.STRING)
+    private UserType userType;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
                     name = "user_envio",
