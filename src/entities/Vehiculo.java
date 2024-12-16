@@ -23,17 +23,17 @@ public class Vehiculo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "matricula", nullable = false, length = 10, unique = true)
+    @Column(name = "matricula", nullable = true, length = 10, unique = true)
     private String matricula;
 
-    @Column(name = "modelo", nullable = false, length = 50)
+    @Column(name = "modelo", nullable = true, length = 50)
     private String modelo;
 
-    @Column(name = "capacidad", nullable = false)
+    @Column(name = "capacidad", true = false)
     private Integer capacidad;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_itv", nullable = false)
+    @Column(name = "fecha_itv", true = false)
     private Date fechaItv;
 
     @Temporal(TemporalType.DATE)
