@@ -17,6 +17,8 @@ import javax.persistence.Id;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import static javax.persistence.FetchType.EAGER;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -30,22 +32,21 @@ import javax.xml.bind.annotation.XmlTransient;
  *
  * @author Omar
  */
-
-@NamedQueries({
-   @NamedQuery(
-           name="findAllPackages",
-           query="SELECT * FROM package ORDER BY id"),
-   @NamedQuery(
-           name="findAllAccounts",
-           query="SELECT s FROM Account s ORDER BY s.id"
-   )
-})
-
+//
+//@NamedQueries({
+//   @NamedQuery(
+//           name="findAllPackages",
+//           query="SELECT * FROM package ORDER BY id"),
+//   @NamedQuery(
+//           name="findAllAccounts",
+//           query="SELECT s FROM Account s ORDER BY s.id"
+//   )
+//})
 @Entity
-@Table(schema="retodb" ,name = "package")
+@Table(schema = "FleetIQ", name = "package")
 @XmlRootElement
 public class PackageEntity implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)// shoud we use here identity or auto 
@@ -62,19 +63,20 @@ public class PackageEntity implements Serializable {
     public PackageEntity() {
     }
 
-    @OneToMany(fetch=EAGER,cascade=ALL,mappedBy="package")
-   
-      private List<Envio> enviosList;
-    @XmlTransient
-     public List<Envio> getEnviosList() {
-        return enviosList;
+    @ManyToOne(fetch = EAGER, cascade = ALL)
+    @JoinColumn(name = "envio_id")
+    private Envio envio;
+
+    public Envio getEnvio() {
+        return envio;
     }
 
-    public void setEnviosList(List<Envio> enviosList) {
-        this.enviosList = enviosList;
+    public void setEnvio(Envio envio) {
+        this.envio = envio;
     }
     
     
+
     public Long getId() {
         return id;
     }
@@ -107,7 +109,6 @@ public class PackageEntity implements Serializable {
         this.weight = weight;
     }
 
-
     public Date getCreationDate() {
         return creationDate;
     }
@@ -132,25 +133,24 @@ public class PackageEntity implements Serializable {
         this.size = size;
     }
 
-        @Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
-    
     // Optional: toString() method for debugging
     @Override
     public String toString() {
-        return "PaqueteEntity{" +
-                "id=" + id +
-                ", sender='" + sender + '\'' +
-                ", receiver='" + receiver + '\'' +
-                ", weight=" + weight +
-                ", size=" + size +
-                ", creationDate=" + creationDate +
-                ", fragile=" + fragile +
-                '}';
+        return "PaqueteEntity{"
+                + "id=" + id
+                + ", sender='" + sender + '\''
+                + ", receiver='" + receiver + '\''
+                + ", weight=" + weight
+                + ", size=" + size
+                + ", creationDate=" + creationDate
+                + ", fragile=" + fragile
+                + '}';
     }
 }

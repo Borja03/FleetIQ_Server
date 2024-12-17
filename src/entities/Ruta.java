@@ -1,7 +1,7 @@
 package entities;
 
 import java.io.Serializable;
-import java.sql.Time;
+
 import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
@@ -19,18 +19,17 @@ public class Ruta implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer localizador;
 
-    @Column(name = "origen", nullable = false)
+    @Column(name = "origen")
     private String origen;
 
-    @Column(name = "destino", nullable = false)
+    @Column(name = "destino")
     private String destino;
 
-    @Column(name = "distancia", nullable = false)
+    @Column(name = "distancia")
     private Float distancia;
 
-    @Temporal(TemporalType.TIME)
     @Column(name = "tiempo", nullable = false)
-    private Time tiempo;
+    private Integer tiempo;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha_creacion", nullable = false)
@@ -84,11 +83,11 @@ public class Ruta implements Serializable {
         this.distancia = distancia;
     }
 
-    public Time getTiempo() {
+    public Integer getTiempo() {
         return tiempo;
     }
 
-    public void setTiempo(Time tiempo) {
+    public void setTiempo(Integer tiempo) {
         this.tiempo = tiempo;
     }
 

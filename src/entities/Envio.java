@@ -8,6 +8,7 @@ import java.util.List;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Entidad JPA que representa un Envío.
@@ -49,17 +50,34 @@ public class Envio implements Serializable {
     private List<PackageEntity> packageList;
 
     @ManyToOne(fetch = EAGER, cascade = ALL)
+    @JoinColumn(name = "envio_ruta_vehiculo_id")
     private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(fetch = EAGER, cascade = ALL)
     @JoinTable(
-        name = "envios_usuarios", // Nombre de la tabla intermedia
-        joinColumns = @JoinColumn(name = "envio_id"), // Columna que referencia la tabla 'envios'
-        inverseJoinColumns = @JoinColumn(name = "user_id") // Columna que referencia la tabla 'user_entity'
+            name = "envios_usuarios", // Nombre de la tabla intermedia
+            joinColumns = @JoinColumn(name = "envio_id"), // Columna que referencia la tabla 'envios'
+            inverseJoinColumns = @JoinColumn(name = "user_id") // Columna que referencia la tabla 'user_entity'
     )
     private List<UserEntity> userList;
 
+    @XmlTransient
+    public List<PackageEntity> getPackageList() {
+        return packageList;
+    }
 
+    public void setPackageList(List<PackageEntity> packageList) {
+        this.packageList = packageList;
+    }
+
+    @XmlTransient
+    public List<UserEntity> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<UserEntity> userList) {
+        this.userList = userList;
+    }
 
     // Getters y Setters
     public Integer getId() {

@@ -31,7 +31,7 @@ public class EnvioRutaVehiculo implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToMany(fetch = EAGER, cascade = CascadeType.ALL, mappedBy = "envio")
+    @OneToMany(fetch = EAGER, cascade = CascadeType.ALL, mappedBy = "envioRutaVehiculo")
     private List<Envio> envio;
 
     @ManyToOne(fetch = EAGER, cascade = CascadeType.ALL)
@@ -91,12 +91,12 @@ public class EnvioRutaVehiculo implements Serializable {
 
     @Override
     public String toString() {
-        return "EnvioRutaVehiculo{" +
-                "id=" + id +
-                ", envio=" + envio +
-                ", ruta=" + ruta +
-                ", vehiculo=" + vehiculo +
-                ", fechaAsignacion=" + fechaAsignacion +
-                '}';
+        return "EnvioRutaVehiculo{"
+                + "id=" + id
+                + ", envio=" + envio
+                + ", ruta=" + ruta
+                + ", vehiculo=" + vehiculo
+                + ", fechaAsignacion=" + fechaAsignacion
+                + '}';
     }
 }
