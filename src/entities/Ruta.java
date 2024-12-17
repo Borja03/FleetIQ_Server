@@ -27,7 +27,7 @@ public class Ruta  implements Serializable{
     @Column(name = "distancia", nullable = true)
     private Float distancia;
 
-    @Temporal(TemporalType.DATE)
+    @Temporal(TemporalType.TIME)
     @Column(name = "tiempo", nullable = true)
     private Time tiempo;
 
