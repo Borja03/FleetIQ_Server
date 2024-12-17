@@ -3,15 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package entitie;
+package entities;
 
 /**
  *
- * @author Omar
+ * @author Alder
+ * Enumeración que representa los estados de un envío.
  */
-public enum  PackageSize {
-    SMALL,
-    MEDIUM,
-    LARGE,
-    EXTRA_LARGE
+public enum Estado {
+    PREPARACION,
+    EN_REPARTO,
+    ENTREGADO
 }
+

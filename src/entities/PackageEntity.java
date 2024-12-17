@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package java.entitie;
+package entities;
 
-import entitie.PackageSize;
+import entities.PackageSize;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
