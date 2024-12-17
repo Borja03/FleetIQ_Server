@@ -16,12 +16,15 @@ import javax.persistence.Table;
 import javax.persistence.Column;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Entidad JPA que representa la relación entre Envío, Ruta y Vehículo.
  */
 @Entity
 @Table(name = "envio_ruta_vehiculo", schema = "FleetIQ")
+@XmlRootElement
 public class EnvioRutaVehiculo implements Serializable {
 
     @Id
@@ -53,6 +56,7 @@ public class EnvioRutaVehiculo implements Serializable {
         this.id = id;
     }
 
+    @XmlTransient
     public List<Envio> getEnvio() {
         return envio;
     }

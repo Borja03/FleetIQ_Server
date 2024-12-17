@@ -24,6 +24,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -64,6 +65,7 @@ public class PackageEntity implements Serializable {
     @OneToMany(fetch=EAGER,cascade=ALL,mappedBy="package")
    
       private List<Envio> enviosList;
+    @XmlTransient
      public List<Envio> getEnviosList() {
         return enviosList;
     }

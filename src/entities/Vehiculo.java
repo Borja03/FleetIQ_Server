@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.*;
 import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Entidad JPA que representa un Vehículo.
@@ -85,6 +86,7 @@ public class Vehiculo implements Serializable {
         this.estado = estado;
     }
 
+    @XmlTransient
     public List<EnvioRutaVehiculo> getEnvioRutaVehiculoList() {
         return envioRutaVehiculoList;
     }
