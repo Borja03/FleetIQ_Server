@@ -1,49 +1,40 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entities;
 
-/**
- *
- * @author 2dam
- */
+import java.io.Serializable;
+import java.util.List;
 import javax.persistence.*;
-import java.util.Date;
+import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entidad JPA que representa un Vehículo.
  */
 @Entity
-@Table(name = "envios", schema="FleetIQ")
+@Table(name = "vehiculo", schema = "FleetIQ")
 @XmlRootElement
-public class Vehiculo {
+public class Vehiculo implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "matricula", nullable = true, length = 10, unique = true)
+    @Column(name = "matricula", nullable = false, unique = true, length = 15)
     private String matricula;
+
+    @Column(name = "marca", nullable = true, length = 50)
+    private String marca;
 
     @Column(name = "modelo", nullable = true, length = 50)
     private String modelo;
 
-    @Column(name = "capacidad", nullable = true)
-    private Integer capacidad;
+    @Column(name = "capacidad_carga", nullable = true)
+    private Float capacidadCarga;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_itv", nullable = true)
-    private Date fechaItv;
+    @Column(name = "estado", nullable = false, length = 20)
+    private String estado; // Ejemplo: "Disponible", "En uso", "Mantenimiento"
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_matriculacion", nullable = true)
-    private Date fechaMatriculacion;
-
-    @Column(name = "activo", nullable = false)
-    private Boolean activo;
+    @OneToMany(fetch = EAGER, cascade = CascadeType.ALL, mappedBy = "vehiculo")
+    private List<EnvioRutaVehiculo> envioRutaVehiculoList;
 
     // Getters y Setters
     public Integer getId() {
@@ -62,6 +53,14 @@ public class Vehiculo {
         this.matricula = matricula;
     }
 
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
+
     public String getModelo() {
         return modelo;
     }
@@ -70,35 +69,39 @@ public class Vehiculo {
         this.modelo = modelo;
     }
 
-    public Integer getCapacidad() {
-        return capacidad;
+    public Float getCapacidadCarga() {
+        return capacidadCarga;
     }
 
-    public void setCapacidad(Integer capacidad) {
-        this.capacidad = capacidad;
+    public void setCapacidadCarga(Float capacidadCarga) {
+        this.capacidadCarga = capacidadCarga;
     }
 
-    public Date getFechaItv() {
-        return fechaItv;
+    public String getEstado() {
+        return estado;
     }
 
-    public void setFechaItv(Date fechaItv) {
-        this.fechaItv = fechaItv;
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 
-    public Date getFechaMatriculacion() {
-        return fechaMatriculacion;
+    public List<EnvioRutaVehiculo> getEnvioRutaVehiculoList() {
+        return envioRutaVehiculoList;
     }
 
-    public void setFechaMatriculacion(Date fechaMatriculacion) {
-        this.fechaMatriculacion = fechaMatriculacion;
+    public void setEnvioRutaVehiculoList(List<EnvioRutaVehiculo> envioRutaVehiculoList) {
+        this.envioRutaVehiculoList = envioRutaVehiculoList;
     }
 
-    public Boolean getActivo() {
-        return activo;
-    }
-
-    public void setActivo(Boolean activo) {
-        this.activo = activo;
+    @Override
+    public String toString() {
+        return "Vehiculo{" +
+                "id=" + id +
+                ", matricula='" + matricula + '\'' +
+                ", marca='" + marca + '\'' +
+                ", modelo='" + modelo + '\'' +
+                ", capacidadCarga=" + capacidadCarga +
+                ", estado='" + estado + '\'' +
+                '}';
     }
 }
