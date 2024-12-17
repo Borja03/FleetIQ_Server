@@ -3,16 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package entities;
+package java.entitie;
 
 /**
  *
- * @author Alder
- * Enumeración que representa los estados de un envío.
+ * @author Omar
  */
-public enum Estado {
-    PREPARACION,
-    EN_REPARTO,
-    ENTREGADO
-}
+public enum UserType {
+    ADMIN,
+    TRABAJADOR
 
+}
