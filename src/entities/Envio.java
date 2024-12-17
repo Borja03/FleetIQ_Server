@@ -1,6 +1,6 @@
-package java.entitie;
+package entities;
 
-import java.entitie.Estado;
+import entities.Estado;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
