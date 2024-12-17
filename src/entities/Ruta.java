@@ -49,7 +49,7 @@ public class Ruta implements Serializable {
 
     // OneToMany relationship with RutaVehiculo
     @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<RutaVehiculo> rutaVehiculos;
+    private List<EnvioRutaVehiculo> envioRutaVehiculos;
 
     // Getters and Setters
     public Integer getLocalizador() {
@@ -100,12 +100,12 @@ public class Ruta implements Serializable {
         this.fechaCreacion = fechaCreacion;
     }
 
-    public List<RutaVehiculo> getRutaVehiculos() {
-        return rutaVehiculos;
+    public List<EnvioRutaVehiculo> getRutaVehiculos() {
+        return envioRutaVehiculos;
     }
 
-    public void setRutaVehiculos(List<RutaVehiculo> rutaVehiculos) {
-        this.rutaVehiculos = rutaVehiculos;
+    public void setRutaVehiculos(List<EnvioRutaVehiculo> rutaVehiculos) {
+        this.envioRutaVehiculos = rutaVehiculos;
     }
 
     @Override
