@@ -48,8 +48,8 @@ public class Envio implements Serializable {
     @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "envio")
     private List<PackageEntity> packageList;
 
-    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "envio")
-    private List<Vehiculo> vehiculoList;
+    @ManyToOne(fetch = EAGER, cascade = ALL)
+    private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(fetch = EAGER, cascade = ALL)
     @JoinTable(
