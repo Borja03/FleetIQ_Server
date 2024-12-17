@@ -1,48 +1,57 @@
 package entities;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.sql.Time;
 import java.util.Date;
+import java.util.List;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entidad JPA que representa una ruta.
  */
 @Entity
-@Table(name = "ruta", schema="FleetIQ")
+@Table(name = "ruta", schema = "FleetIQ")
 @XmlRootElement
-public class Ruta  implements Serializable{
+public class Ruta implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer localizador;
 
-    @Column(name = "origen", nullable = true)
+    @Column(name = "origen", nullable = false)
     private String origen;
 
-    @Column(name = "destino", nullable = true)
+    @Column(name = "destino", nullable = false)
     private String destino;
 
-    @Column(name = "distancia", nullable = true)
+    @Column(name = "distancia", nullable = false)
     private Float distancia;
 
     @Temporal(TemporalType.TIME)
-    @Column(name = "tiempo", nullable = true)
+    @Column(name = "tiempo", nullable = false)
     private Time tiempo;
 
     @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_creacion", nullable = true)
+    @Column(name = "fecha_creacion", nullable = false)
     private Date fechaCreacion;
-    
-    @Column(name = "vehiculo", length = 50)
-    private String vehiculo;
-    
+
+    public Integer getNumVehiculos() {
+        return numVehiculos;
+    }
+
+    public void setNumVehiculos(Integer numVehiculos) {
+        this.numVehiculos = numVehiculos;
+    }
+
     @Column(name = "num_vehiculos", nullable = true)
     private Integer numVehiculos;
 
-  
-    // Getters y Setters
+    // OneToMany relationship with RutaVehiculo
+    @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RutaVehiculo> rutaVehiculos;
+
+    // Getters and Setters
     public Integer getLocalizador() {
         return localizador;
     }
@@ -91,26 +100,24 @@ public class Ruta  implements Serializable{
         this.fechaCreacion = fechaCreacion;
     }
 
-    public String getVehiculo() {
-        return vehiculo;
+    public List<RutaVehiculo> getRutaVehiculos() {
+        return rutaVehiculos;
     }
 
-    public void setVehiculo(String vehiculo) {
-        this.vehiculo = vehiculo;
-    }
-
-    
-    public Integer getNumVehiculos() {
-        return numVehiculos;
-    }
-
-    public void setNumVehiculos(Integer numVehiculos) {
-        this.numVehiculos = numVehiculos;
+    public void setRutaVehiculos(List<RutaVehiculo> rutaVehiculos) {
+        this.rutaVehiculos = rutaVehiculos;
     }
 
     @Override
     public String toString() {
-        return "Ruta{" + "localizador=" + localizador + ", origen=" + origen + ", destino=" + destino + ", distancia=" + distancia + ", tiempo=" + tiempo + ", fechaCreacion=" + fechaCreacion + ", vehiculo=" + vehiculo + ", numVehiculos=" + numVehiculos + '}';
+        return "Ruta{"
+                + "localizador=" + localizador
+                + ", origen='" + origen + '\''
+                + ", destino='" + destino + '\''
+                + ", distancia=" + distancia
+                + ", tiempo=" + tiempo
+                + ", fechaCreacion=" + fechaCreacion
+                +", numPaquetes=" + numVehiculos
+                + '}';
     }
-    
 }
