@@ -32,21 +32,21 @@ import javax.xml.bind.annotation.XmlTransient;
  *
  * @author Omar
  */
-@NamedQueries({
-    @NamedQuery(
-                    name = "findAllPackages",
-                    query = "SELECT * FROM package ORDER BY id")
-    ,
-   @NamedQuery(
-                    name = "queryname",
-                    query = "query"
-    )
-})
+//@NamedQueries({
+//    @NamedQuery(
+//                    name = "findAllPackages",
+//                    query = "SELECT * FROM package ORDER BY id")
+//    ,
+//   @NamedQuery(
+//                    name = "queryname",
+//                    query = "query"
+//    )
+//})
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
-@Table(schema = "retodb", name = "user")
+@Table(schema = "FleetIQ", name = "user")
 @XmlRootElement
 public class UserEntity implements Serializable {
 
@@ -63,8 +63,8 @@ public class UserEntity implements Serializable {
     private String street;
     private Integer zip;
     private boolean activo;
-   @Enumerated(EnumType.STRING)
-    private UserType userType;
+//   @Enumerated(EnumType.STRING)
+//    private UserType userType;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
                     name = "user_envio",
