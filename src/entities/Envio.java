@@ -45,26 +45,21 @@ public class Envio implements Serializable {
     @Column(name = "vehiculo", length = 10)
     private String vehiculo;
 
-    @ManyToOne(fetch = EAGER, cascade = ALL)
+    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "envio")
     private List<PackageEntity> packageList;
 
-    public List<PackageEntity> getpackageList() {
-        return packageList;
-    }
-    
     @ManyToOne(fetch = EAGER, cascade = ALL)
-    private List<Vehiculo> vehicleList;
+    private EnvioRutaVehiculo envioRutaVehiculo;
 
-    public List<Vehiculo> getvehicleList() {
-        return vehicleList;
-    }
-    
-    @ManyToOne(fetch = EAGER, cascade = ALL)
+    @ManyToMany(fetch = EAGER, cascade = ALL)
+    @JoinTable(
+        name = "envios_usuarios", // Nombre de la tabla intermedia
+        joinColumns = @JoinColumn(name = "envio_id"), // Columna que referencia la tabla 'envios'
+        inverseJoinColumns = @JoinColumn(name = "user_id") // Columna que referencia la tabla 'user_entity'
+    )
     private List<UserEntity> userList;
 
-    public List<UserEntity> getuserList() {
-        return userList;
-    }
+
 
     // Getters y Setters
     public Integer getId() {
