@@ -28,7 +28,7 @@ import javax.ws.rs.core.MediaType;
 @Path("entities.enviorutavehiculo")
 public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehiculo> {
 
-    @PersistenceContext(unitName = "FleetIQ_ServerPU")
+    @PersistenceContext(unitName = "JavaFX-WebApplicationUD5ExamplePU")
     private EntityManager em;
 
     public EnvioRutaVehiculoFacadeREST() {

@@ -5,7 +5,7 @@
  */
 package service;
 
-import entities.TrabajadorEntity;
+import entities.UserEntity;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -25,27 +25,27 @@ import javax.ws.rs.core.MediaType;
  * @author 2dam
  */
 @Stateless
-@Path("entities.trabajadorentity")
-public class TrabajadorEntityFacadeREST extends AbstractFacade<TrabajadorEntity> {
+@Path("entities.userentity")
+public class UserEntityFacadeREST extends AbstractFacade<UserEntity> {
 
-    @PersistenceContext(unitName = "FleetIQ_ServerPU")
+    @PersistenceContext(unitName = "JavaFX-WebApplicationUD5ExamplePU")
     private EntityManager em;
 
-    public TrabajadorEntityFacadeREST() {
-        super(TrabajadorEntity.class);
+    public UserEntityFacadeREST() {
+        super(UserEntity.class);
     }
 
     @POST
     @Override
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(TrabajadorEntity entity) {
+    public void create(UserEntity entity) {
         super.create(entity);
     }
 
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Long id, TrabajadorEntity entity) {
+    public void edit(@PathParam("id") Long id, UserEntity entity) {
         super.edit(entity);
     }
 
@@ -58,21 +58,21 @@ public class TrabajadorEntityFacadeREST extends AbstractFacade<TrabajadorEntity>
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public TrabajadorEntity find(@PathParam("id") Long id) {
+    public UserEntity find(@PathParam("id") Long id) {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<TrabajadorEntity> findAll() {
+    public List<UserEntity> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<TrabajadorEntity> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<UserEntity> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 

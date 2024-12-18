@@ -5,7 +5,7 @@
  */
 package service;
 
-import entities.UserEntity;
+import entities.AdminEntity;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -25,27 +25,27 @@ import javax.ws.rs.core.MediaType;
  * @author 2dam
  */
 @Stateless
-@Path("entities.userentity")
-public class UserEntityFacadeREST extends AbstractFacade<UserEntity> {
+@Path("entities.adminentity")
+public class AdminEntityFacadeREST extends AbstractFacade<AdminEntity> {
 
-    @PersistenceContext(unitName = "FleetIQ_ServerPU")
+    @PersistenceContext(unitName = "JavaFX-WebApplicationUD5ExamplePU")
     private EntityManager em;
 
-    public UserEntityFacadeREST() {
-        super(UserEntity.class);
+    public AdminEntityFacadeREST() {
+        super(AdminEntity.class);
     }
 
     @POST
     @Override
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(UserEntity entity) {
+    public void create(AdminEntity entity) {
         super.create(entity);
     }
 
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Long id, UserEntity entity) {
+    public void edit(@PathParam("id") Long id, AdminEntity entity) {
         super.edit(entity);
     }
 
@@ -58,21 +58,21 @@ public class UserEntityFacadeREST extends AbstractFacade<UserEntity> {
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public UserEntity find(@PathParam("id") Long id) {
+    public AdminEntity find(@PathParam("id") Long id) {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<UserEntity> findAll() {
+    public List<AdminEntity> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<UserEntity> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<AdminEntity> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 

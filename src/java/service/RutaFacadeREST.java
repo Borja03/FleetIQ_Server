@@ -5,7 +5,7 @@
  */
 package service;
 
-import entities.AdminEntity;
+import entities.Ruta;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -25,54 +25,54 @@ import javax.ws.rs.core.MediaType;
  * @author 2dam
  */
 @Stateless
-@Path("entities.adminentity")
-public class AdminEntityFacadeREST extends AbstractFacade<AdminEntity> {
+@Path("entities.ruta")
+public class RutaFacadeREST extends AbstractFacade<Ruta> {
 
-    @PersistenceContext(unitName = "FleetIQ_ServerPU")
+    @PersistenceContext(unitName = "JavaFX-WebApplicationUD5ExamplePU")
     private EntityManager em;
 
-    public AdminEntityFacadeREST() {
-        super(AdminEntity.class);
+    public RutaFacadeREST() {
+        super(Ruta.class);
     }
 
     @POST
     @Override
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(AdminEntity entity) {
+    public void create(Ruta entity) {
         super.create(entity);
     }
 
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Long id, AdminEntity entity) {
+    public void edit(@PathParam("id") Integer id, Ruta entity) {
         super.edit(entity);
     }
 
     @DELETE
     @Path("{id}")
-    public void remove(@PathParam("id") Long id) {
+    public void remove(@PathParam("id") Integer id) {
         super.remove(super.find(id));
     }
 
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public AdminEntity find(@PathParam("id") Long id) {
+    public Ruta find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<AdminEntity> findAll() {
+    public List<Ruta> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<AdminEntity> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<Ruta> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 
