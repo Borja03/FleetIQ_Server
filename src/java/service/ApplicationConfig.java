@@ -36,7 +36,7 @@ public class ApplicationConfig extends Application {
         resources.add(service.RutaFacadeREST.class);
         resources.add(service.TrabajadorEntityFacadeREST.class);
         resources.add(service.UserEntityFacadeREST.class);
-        resources.add(service.VehiculoFacadeREST.class);
+        resources.add(service.VehiculoREST.class);
     }
     
 }

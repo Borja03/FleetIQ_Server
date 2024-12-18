@@ -63,25 +63,26 @@ public class UserEntity implements Serializable {
     private String street;
     private Integer zip;
     private boolean activo;
-//   @Enumerated(EnumType.STRING)
-//    private UserType userType;
-//    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-//    @JoinTable(
-//                    name = "user_envio",
-//                    joinColumns = @JoinColumn(name = "user_id"),
-//                    inverseJoinColumns = @JoinColumn(name = "envio_id")
-//    )
-//
-//    private List<Envio> enviosList;
+    
+   @Enumerated(EnumType.STRING)
+    private UserType userType;
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+                    schema = "FleetIQ",  name = "user_envio",
+                    joinColumns = @JoinColumn(name = "user_id"),
+                    inverseJoinColumns = @JoinColumn(name = "envio_id")
+    )
 
-//    @XmlTransient
-//    public List<Envio> getEnviosList() {
-//        return enviosList;
-//    }
-//
-//    public void setEnviosList(List<Envio> enviosList) {
-//        this.enviosList = enviosList;
-//    }
+    private List<Envio> enviosList;
+
+    @XmlTransient
+    public List<Envio> getEnviosList() {
+        return enviosList;
+    }
+
+    public void setEnviosList(List<Envio> enviosList) {
+        this.enviosList = enviosList;
+    }
 
     public Long getId() {
         return id;
