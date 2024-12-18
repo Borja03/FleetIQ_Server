@@ -5,7 +5,7 @@
  */
 package service;
 
-import entitie.TrabajadorEntity;
+import entities.TrabajadorEntity;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -22,10 +22,10 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author Omar
+ * @author 2dam
  */
 @Stateless
-@Path("entitie.trabajadorentity")
+@Path("entities.trabajadorentity")
 public class TrabajadorEntityFacadeREST extends AbstractFacade<TrabajadorEntity> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")

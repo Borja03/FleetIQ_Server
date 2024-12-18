@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package entitie;
+package entities;
 
 import java.io.Serializable;
 import java.util.List;
@@ -11,6 +11,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -24,26 +26,27 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author Omar
  */
-@NamedQueries({
-    @NamedQuery(
-                    name = "findAllPackages",
-                    query = "SELECT * FROM package ORDER BY id")
-    ,
-   @NamedQuery(
-                    name = "queryname",
-                    query = "query"
-    )
-})
+//@NamedQueries({
+//    @NamedQuery(
+//                    name = "findAllPackages",
+//                    query = "SELECT * FROM package ORDER BY id")
+//    ,
+//   @NamedQuery(
+//                    name = "queryname",
+//                    query = "query"
+//    )
+//})
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
-@Table(schema = "retodb", name = "user")
+@Table(schema = "FleetIQ2", name = "user")
 @XmlRootElement
 public class UserEntity implements Serializable {
 
@@ -60,8 +63,8 @@ public class UserEntity implements Serializable {
     private String street;
     private Integer zip;
     private boolean activo;
-   @Enumerated(EnumType.STRING)
-    private UserType userType;
+//   @Enumerated(EnumType.STRING)
+//    private UserType userType;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
                     name = "user_envio",
@@ -71,6 +74,7 @@ public class UserEntity implements Serializable {
 
     private List<Envio> enviosList;
 
+    @XmlTransient
     public List<Envio> getEnviosList() {
         return enviosList;
     }

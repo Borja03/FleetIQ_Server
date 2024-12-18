@@ -5,7 +5,7 @@
  */
 package service;
 
-import entitie.PackageEntity;
+import entities.PackageEntity;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -22,16 +22,16 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author Omar
+ * @author 2dam
  */
 @Stateless
-@Path("entitie.paqueteentity")
-public class PaqueteEntityFacadeREST extends AbstractFacade<PackageEntity> {
+@Path("entities.packageentity")
+public class PackageEntityFacadeREST extends AbstractFacade<PackageEntity> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
     private EntityManager em;
 
-    public PaqueteEntityFacadeREST() {
+    public PackageEntityFacadeREST() {
         super(PackageEntity.class);
     }
 

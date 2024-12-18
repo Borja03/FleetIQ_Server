@@ -5,7 +5,7 @@
  */
 package service;
 
-import entitie.AdminEntity;
+import entities.AdminEntity;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -22,10 +22,10 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author Omar
+ * @author 2dam
  */
 @Stateless
-@Path("entitie.adminentity")
+@Path("entities.adminentity")
 public class AdminEntityFacadeREST extends AbstractFacade<AdminEntity> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")

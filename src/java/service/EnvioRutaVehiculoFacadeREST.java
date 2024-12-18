@@ -5,7 +5,7 @@
  */
 package service;
 
-import entities.UserEntity;
+import entities.EnvioRutaVehiculo;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -25,54 +25,54 @@ import javax.ws.rs.core.MediaType;
  * @author 2dam
  */
 @Stateless
-@Path("entities.userentity")
-public class UserEntityFacadeREST extends AbstractFacade<UserEntity> {
+@Path("entities.enviorutavehiculo")
+public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehiculo> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
     private EntityManager em;
 
-    public UserEntityFacadeREST() {
-        super(UserEntity.class);
+    public EnvioRutaVehiculoFacadeREST() {
+        super(EnvioRutaVehiculo.class);
     }
 
     @POST
     @Override
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(UserEntity entity) {
+    public void create(EnvioRutaVehiculo entity) {
         super.create(entity);
     }
 
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Long id, UserEntity entity) {
+    public void edit(@PathParam("id") Integer id, EnvioRutaVehiculo entity) {
         super.edit(entity);
     }
 
     @DELETE
     @Path("{id}")
-    public void remove(@PathParam("id") Long id) {
+    public void remove(@PathParam("id") Integer id) {
         super.remove(super.find(id));
     }
 
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public UserEntity find(@PathParam("id") Long id) {
+    public EnvioRutaVehiculo find(@PathParam("id") Integer id) {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<UserEntity> findAll() {
+    public List<EnvioRutaVehiculo> findAll() {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<UserEntity> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<EnvioRutaVehiculo> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return super.findRange(new int[]{from, to});
     }
 
