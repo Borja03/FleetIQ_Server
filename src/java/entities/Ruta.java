@@ -7,6 +7,43 @@ import java.util.List;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 
+
+@NamedQueries({
+    @NamedQuery(
+        name = "Ruta.findAll",
+        query = "SELECT r FROM Ruta r"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterByDates",
+        query = "SELECT r FROM Ruta r WHERE r.fechaCreacion BETWEEN :firstDate AND :secondDate"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterTiempoMayor",
+        query = "SELECT r FROM Ruta r WHERE r.tiempo > :tiempo"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterTiempoMenor",
+        query = "SELECT r FROM Ruta r WHERE r.tiempo < :tiempo"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterTiempoIgual",
+        query = "SELECT r FROM Ruta r WHERE r.tiempo = :tiempo"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterDistanciaMayor",
+        query = "SELECT r FROM Ruta r WHERE r.distancia > :distancia"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterDistanciaMenor",
+        query = "SELECT r FROM Ruta r WHERE r.distancia < :distancia"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterDistanciaIgual",
+        query = "SELECT r FROM Ruta r WHERE r.distancia = :distancia"
+    )
+})
+
+
 /**
  * Entidad JPA que representa una ruta.
  */
@@ -30,6 +67,9 @@ public class Ruta implements Serializable {
 
     @Column(name = "tiempo", nullable = false)
     private Integer tiempo;
+    
+    @Enumerated(EnumType.STRING)
+    private FilterTypeRuta type;
 
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha_creacion", nullable = false)
@@ -107,16 +147,25 @@ public class Ruta implements Serializable {
         this.envioRutaVehiculos = rutaVehiculos;
     }
 
+    public FilterTypeRuta getType() {
+        return type;
+    }
+
+    public void setType(FilterTypeRuta type) {
+        this.type = type;
+    }
+
+    public List<EnvioRutaVehiculo> getEnvioRutaVehiculos() {
+        return envioRutaVehiculos;
+    }
+
+    public void setEnvioRutaVehiculos(List<EnvioRutaVehiculo> envioRutaVehiculos) {
+        this.envioRutaVehiculos = envioRutaVehiculos;
+    }
+
     @Override
     public String toString() {
-        return "Ruta{"
-                + "localizador=" + localizador
-                + ", origen='" + origen + '\''
-                + ", destino='" + destino + '\''
-                + ", distancia=" + distancia
-                + ", tiempo=" + tiempo
-                + ", fechaCreacion=" + fechaCreacion
-                +", numPaquetes=" + numVehiculos
-                + '}';
+        return "Ruta{" + "localizador=" + localizador + ", origen=" + origen + ", destino=" + destino + ", distancia=" + distancia + ", tiempo=" + tiempo + ", type=" + type + ", fechaCreacion=" + fechaCreacion + ", numVehiculos=" + numVehiculos + ", envioRutaVehiculos=" + envioRutaVehiculos + '}';
     }
+    
 }
