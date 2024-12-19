@@ -56,7 +56,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
 @Table(schema = "FleetIQ", name = "user")
 @XmlRootElement
-public class UserEntity implements Serializable {
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id

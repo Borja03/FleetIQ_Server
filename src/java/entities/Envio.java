@@ -46,10 +46,10 @@ public class Envio implements Serializable {
     private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(mappedBy = "enviosList")
-    private List<UserEntity> usersList;
+    private List<User> usersList;
 
     @OneToMany(cascade=ALL,mappedBy="envio",fetch=EAGER)
-    private List<PackageEntity> packageList;
+    private List<Package> packageList;
     
  
     // Getters y Setters
@@ -118,11 +118,11 @@ public class Envio implements Serializable {
     }
 
     @XmlTransient
-    public List<UserEntity> getUsersList() {
+    public List<User> getUsersList() {
         return usersList;
     }
 
-    public void setUsersList(List<UserEntity> usersList) {
+    public void setUsersList(List<User> usersList) {
         this.usersList = usersList;
     }
 

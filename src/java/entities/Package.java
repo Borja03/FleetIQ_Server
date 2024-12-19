@@ -65,7 +65,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(schema = "FleetIQ", name = "package")
 @XmlRootElement
-public class PackageEntity implements Serializable {
+public class Package implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -80,7 +80,7 @@ public class PackageEntity implements Serializable {
     private Date creationDate;
     private boolean fragile;
 
-    public PackageEntity() {
+    public Package() {
     }
 
     @ManyToOne(fetch = EAGER, cascade = ALL)
