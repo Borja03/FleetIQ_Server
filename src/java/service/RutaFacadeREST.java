@@ -83,9 +83,81 @@ public class RutaFacadeREST extends AbstractFacade<Ruta> {
         return String.valueOf(super.count());
     }
 
+    // Filter by dates
+    @GET
+    @Path("filterByDates/{firstDate}/{secondDate}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterByDates(
+            @PathParam("firstDate") String firstDate,
+            @PathParam("secondDate") String secondDate) {
+        return em.createNamedQuery("Ruta.filterByDates", Ruta.class)
+                .setParameter("firstDate", java.sql.Date.valueOf(firstDate))
+                .setParameter("secondDate", java.sql.Date.valueOf(secondDate))
+                .getResultList();
+    }
+
+    // Filter by tiempo > X
+    @GET
+    @Path("filterTiempoMayor/{tiempo}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterTiempoMayor(@PathParam("tiempo") Integer tiempo) {
+        return em.createNamedQuery("Ruta.filterTiempoMayor", Ruta.class)
+                .setParameter("tiempo", tiempo)
+                .getResultList();
+    }
+
+    // Filter by tiempo < X
+    @GET
+    @Path("filterTiempoMenor/{tiempo}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterTiempoMenor(@PathParam("tiempo") Integer tiempo) {
+        return em.createNamedQuery("Ruta.filterTiempoMenor", Ruta.class)
+                .setParameter("tiempo", tiempo)
+                .getResultList();
+    }
+
+    // Filter by tiempo = X
+    @GET
+    @Path("filterTiempoIgual/{tiempo}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterTiempoIgual(@PathParam("tiempo") Integer tiempo) {
+        return em.createNamedQuery("Ruta.filterTiempoIgual", Ruta.class)
+                .setParameter("tiempo", tiempo)
+                .getResultList();
+    }
+
+    // Filter by distancia > X
+    @GET
+    @Path("filterDistanciaMayor/{distancia}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterDistanciaMayor(@PathParam("distancia") Float distancia) {
+        return em.createNamedQuery("Ruta.filterDistanciaMayor", Ruta.class)
+                .setParameter("distancia", distancia)
+                .getResultList();
+    }
+
+    // Filter by distancia < X
+    @GET
+    @Path("filterDistanciaMenor/{distancia}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterDistanciaMenor(@PathParam("distancia") Float distancia) {
+        return em.createNamedQuery("Ruta.filterDistanciaMenor", Ruta.class)
+                .setParameter("distancia", distancia)
+                .getResultList();
+    }
+
+    // Filter by distancia = X
+    @GET
+    @Path("filterDistanciaIgual/{distancia}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterDistanciaIgual(@PathParam("distancia") Float distancia) {
+        return em.createNamedQuery("Ruta.filterDistanciaIgual", Ruta.class)
+                .setParameter("distancia", distancia)
+                .getResultList();
+    }
+
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
-    
 }
