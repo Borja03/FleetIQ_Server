@@ -1,10 +1,9 @@
 package entities;
 
-import entities.Estado;
 import java.io.Serializable;
-import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.*;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -14,7 +13,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * Entidad JPA que representa un Envío.
  */
 @Entity
-@Table(name = "envios", schema = "FleetIQ2")
+@Table(name = "envio", schema = "FleetIQ")
 @XmlRootElement
 public class Envio implements Serializable {
 
@@ -22,58 +21,37 @@ public class Envio implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_envio", nullable = true)
+    @Column(name = "descripcion", nullable = false, length = 255)
+    private String descripcion;
+
+    @Column(name = "destinatario", nullable = false, length = 100)
+    private String destinatario;
+
+    @Column(name = "direccion_entrega", nullable = false, length = 255)
+    private String direccionEntrega;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "fecha_envio", nullable = false)
     private Date fechaEnvio;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_entrega")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "fecha_entrega", nullable = true)
     private Date fechaEntrega;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "estado", nullable = true)
-    private Estado estado;
+    @Column(name = "estado", nullable = false, length = 50)
+    private String estado; // Ejemplo: "Pendiente", "En tránsito", "Entregado"
 
-    @Column(name = "num_paquetes", nullable = true)
-    private Integer numPaquetes;
-
-    @Column(name = "creador_envio", nullable = true, length = 30)
-    private String creadorEnvio;
-
-    @Column(name = "ruta", length = 7)
-    private String ruta;
-
-    @Column(name = "vehiculo", length = 10)
-    private String vehiculo;
-
-    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "envio")
-    private List<PackageEntity> packageList;
-
-    @ManyToOne(fetch = EAGER, cascade = ALL)
-    @JoinColumn(name = "envio_ruta_vehiculo_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "envio_ruta_vehiculo_id", nullable = false)
     private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(mappedBy = "enviosList")
-    private List<UserEntity> userList;
+    private List<UserEntity> usersList;
 
-    @XmlTransient
-    public List<PackageEntity> getPackageList() {
-        return packageList;
-    }
-
-    public void setPackageList(List<PackageEntity> packageList) {
-        this.packageList = packageList;
-    }
-
-    @XmlTransient
-    public List<UserEntity> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(List<UserEntity> userList) {
-        this.userList = userList;
-    }
-
+    @OneToMany(cascade=ALL,mappedBy="envio",fetch=EAGER)
+    private List<PackageEntity> packageList;
+    
+ 
     // Getters y Setters
     public Integer getId() {
         return id;
@@ -81,6 +59,30 @@ public class Envio implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public String getDestinatario() {
+        return destinatario;
+    }
+
+    public void setDestinatario(String destinatario) {
+        this.destinatario = destinatario;
+    }
+
+    public String getDireccionEntrega() {
+        return direccionEntrega;
+    }
+
+    public void setDireccionEntrega(String direccionEntrega) {
+        this.direccionEntrega = direccionEntrega;
     }
 
     public Date getFechaEnvio() {
@@ -99,48 +101,42 @@ public class Envio implements Serializable {
         this.fechaEntrega = fechaEntrega;
     }
 
-    public Estado getEstado() {
+    public String getEstado() {
         return estado;
     }
 
-    public void setEstado(Estado estado) {
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 
-    public Integer getNumPaquetes() {
-        return numPaquetes;
+    public EnvioRutaVehiculo getEnvioRutaVehiculo() {
+        return envioRutaVehiculo;
     }
 
-    public void setNumPaquetes(Integer numPaquetes) {
-        this.numPaquetes = numPaquetes;
+    public void setEnvioRutaVehiculo(EnvioRutaVehiculo envioRutaVehiculo) {
+        this.envioRutaVehiculo = envioRutaVehiculo;
     }
 
-    public String getCreadorEnvio() {
-        return creadorEnvio;
+    @XmlTransient
+    public List<UserEntity> getUsersList() {
+        return usersList;
     }
 
-    public void setCreadorEnvio(String creadorEnvio) {
-        this.creadorEnvio = creadorEnvio;
-    }
-
-    public String getRuta() {
-        return ruta;
-    }
-
-    public void setRuta(String ruta) {
-        this.ruta = ruta;
-    }
-
-    public String getVehiculo() {
-        return vehiculo;
-    }
-
-    public void setVehiculo(String vehiculo) {
-        this.vehiculo = vehiculo;
+    public void setUsersList(List<UserEntity> usersList) {
+        this.usersList = usersList;
     }
 
     @Override
     public String toString() {
-        return "Envio{" + "id=" + id + ", fechaEnvio=" + fechaEnvio + ", fechaEntrega=" + fechaEntrega + ", estado=" + estado + ", numPaquetes=" + numPaquetes + ", creadorEnvio=" + creadorEnvio + ", ruta=" + ruta + ", vehiculo=" + vehiculo + '}';
+        return "Envio{"
+                + "id=" + id
+                + ", descripcion='" + descripcion + '\''
+                + ", destinatario='" + destinatario + '\''
+                + ", direccionEntrega='" + direccionEntrega + '\''
+                + ", fechaEnvio=" + fechaEnvio
+                + ", fechaEntrega=" + fechaEntrega
+                + ", estado='" + estado + '\''
+                + ", envioRutaVehiculo=" + (envioRutaVehiculo != null ? envioRutaVehiculo.getId() : "null")
+                + '}';
     }
 }

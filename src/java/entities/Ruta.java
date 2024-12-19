@@ -1,122 +1,96 @@
 package entities;
 
 import java.io.Serializable;
-
-import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
- * Entidad JPA que representa una ruta.
+ * Entidad JPA que representa una Ruta.
  */
 @Entity
-@Table(name = "ruta", schema = "FleetIQ2")
+@Table(name = "ruta", schema = "FleetIQ")
 @XmlRootElement
 public class Ruta implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer localizador;
+    private Integer id;
 
-    @Column(name = "origen")
-    private String origen;
+    @Column(name = "nombre", nullable = false, length = 100)
+    private String nombre;
 
-    @Column(name = "destino")
-    private String destino;
+    @Column(name = "descripcion", nullable = true, length = 255)
+    private String descripcion;
 
-    @Column(name = "distancia")
-    private Float distancia;
+    @Column(name = "duracion_estimada", nullable = true)
+    private Double duracionEstimada;
 
-    @Column(name = "tiempo", nullable = false)
-    private Integer tiempo;
+    @Column(name = "distancia", nullable = true)
+    private Double distancia;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "fecha_creacion", nullable = false)
-    private Date fechaCreacion;
+    @OneToMany(mappedBy = "ruta", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<EnvioRutaVehiculo> envioRutaVehiculoList;
 
-    public Integer getNumVehiculos() {
-        return numVehiculos;
+    // Getters y Setters
+    public Integer getId() {
+        return id;
     }
 
-    public void setNumVehiculos(Integer numVehiculos) {
-        this.numVehiculos = numVehiculos;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    @Column(name = "num_vehiculos", nullable = true)
-    private Integer numVehiculos;
-
-    // OneToMany relationship with RutaVehiculo
-    @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<EnvioRutaVehiculo> envioRutaVehiculos;
-
-    // Getters and Setters
-    public Integer getLocalizador() {
-        return localizador;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setLocalizador(Integer localizador) {
-        this.localizador = localizador;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
-    public String getOrigen() {
-        return origen;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public void setOrigen(String origen) {
-        this.origen = origen;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
-    public String getDestino() {
-        return destino;
+    public Double getDuracionEstimada() {
+        return duracionEstimada;
     }
 
-    public void setDestino(String destino) {
-        this.destino = destino;
+    public void setDuracionEstimada(Double duracionEstimada) {
+        this.duracionEstimada = duracionEstimada;
     }
 
-    public Float getDistancia() {
+    public Double getDistancia() {
         return distancia;
     }
 
-    public void setDistancia(Float distancia) {
+    public void setDistancia(Double distancia) {
         this.distancia = distancia;
     }
 
-    public Integer getTiempo() {
-        return tiempo;
+    @XmlTransient
+    public List<EnvioRutaVehiculo> getEnvioRutaVehiculoList() {
+        return envioRutaVehiculoList;
     }
 
-    public void setTiempo(Integer tiempo) {
-        this.tiempo = tiempo;
-    }
-
-    public Date getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(Date fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
-
-    public List<EnvioRutaVehiculo> getRutaVehiculos() {
-        return envioRutaVehiculos;
-    }
-
-    public void setRutaVehiculos(List<EnvioRutaVehiculo> rutaVehiculos) {
-        this.envioRutaVehiculos = rutaVehiculos;
+    public void setEnvioRutaVehiculoList(List<EnvioRutaVehiculo> envioRutaVehiculoList) {
+        this.envioRutaVehiculoList = envioRutaVehiculoList;
     }
 
     @Override
     public String toString() {
-        return "Ruta{"
-                + "localizador=" + localizador
-                + ", origen='" + origen + '\''
-                + ", destino='" + destino + '\''
-                + ", distancia=" + distancia
-                + ", tiempo=" + tiempo
-                + ", fechaCreacion=" + fechaCreacion
-                +", numPaquetes=" + numVehiculos
-                + '}';
+        return "Ruta{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", descripcion='" + descripcion + '\'' +
+                ", duracionEstimada=" + duracionEstimada +
+                ", distancia=" + distancia +
+                '}';
     }
 }

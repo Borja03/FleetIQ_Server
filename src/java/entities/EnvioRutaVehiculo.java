@@ -1,29 +1,15 @@
 package entities;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Date;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import static javax.persistence.FetchType.EAGER;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Entidad JPA que representa la relación entre Envío, Ruta y Vehículo.
  */
 @Entity
-@Table(name = "envio_ruta_vehiculo", schema = "FleetIQ2")
+@Table(name = "envio_ruta_vehiculo", schema = "FleetIQ")
 @XmlRootElement
 public class EnvioRutaVehiculo implements Serializable {
 
@@ -31,18 +17,18 @@ public class EnvioRutaVehiculo implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @OneToMany(fetch = EAGER, cascade = CascadeType.ALL, mappedBy = "envioRutaVehiculo")
-    private List<Envio> envio;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "envio_id", nullable = false)
+    private Envio envio;
 
-    @ManyToOne(fetch = EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "ruta_id")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "ruta_id", nullable = false)
     private Ruta ruta;
 
-    @ManyToOne(fetch = EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "vehiculo_id")
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "vehiculo_id", nullable = false)
     private Vehiculo vehiculo;
 
-    // Nueva columna: Fecha de asignación
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "fecha_asignacion", nullable = false)
     private Date fechaAsignacion;
@@ -56,12 +42,11 @@ public class EnvioRutaVehiculo implements Serializable {
         this.id = id;
     }
 
-    @XmlTransient
-    public List<Envio> getEnvio() {
+    public Envio getEnvio() {
         return envio;
     }
 
-    public void setEnvio(List<Envio> envio) {
+    public void setEnvio(Envio envio) {
         this.envio = envio;
     }
 
@@ -91,12 +76,12 @@ public class EnvioRutaVehiculo implements Serializable {
 
     @Override
     public String toString() {
-        return "EnvioRutaVehiculo{"
-                + "id=" + id
-                + ", envio=" + envio
-                + ", ruta=" + ruta
-                + ", vehiculo=" + vehiculo
-                + ", fechaAsignacion=" + fechaAsignacion
-                + '}';
+        return "EnvioRutaVehiculo{" +
+                "id=" + id +
+                ", envio=" + (envio != null ? envio.getId() : "null") +
+                ", ruta=" + (ruta != null ? ruta.getId() : "null") +
+                ", vehiculo=" + (vehiculo != null ? vehiculo.getId() : "null") +
+                ", fechaAsignacion=" + fechaAsignacion +
+                '}';
     }
 }

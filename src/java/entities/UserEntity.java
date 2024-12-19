@@ -8,6 +8,7 @@ package entities;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
@@ -32,21 +33,28 @@ import javax.xml.bind.annotation.XmlTransient;
  *
  * @author Omar
  */
-//@NamedQueries({
-//    @NamedQuery(
-//                    name = "findAllPackages",
-//                    query = "SELECT * FROM package ORDER BY id")
-//    ,
-//   @NamedQuery(
-//                    name = "queryname",
-//                    query = "query"
-//    )
-//})
+
+
+@NamedQueries({
+    @NamedQuery(
+            name = "findAllUsers",
+            query = "Select u From UserEntity u")
+    ,
+   @NamedQuery(
+            name = "signin",
+            query = "SELECT u FROM UserEntity u WHERE u.email = :userEmail AND u.password = :userPassword"
+    )
+    ,
+   @NamedQuery(
+            name = "findUserByEmail",
+            query = "SELECT u FROM UserEntity u WHERE u.email=:userEmail")
+   
+})
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
-@Table(schema = "FleetIQ2", name = "user")
+@Table(schema = "FleetIQ", name = "user")
 @XmlRootElement
 public class UserEntity implements Serializable {
 
@@ -54,7 +62,7 @@ public class UserEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
-    @NotNull
+    @Column(unique = true)
     private String email;
     private String name;
     private String password;
@@ -63,11 +71,12 @@ public class UserEntity implements Serializable {
     private String street;
     private Integer zip;
     private boolean activo;
+    
 //   @Enumerated(EnumType.STRING)
 //    private UserType userType;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-                    name = "user_envio",
+                    schema = "FleetIQ",  name = "user_envio",
                     joinColumns = @JoinColumn(name = "user_id"),
                     inverseJoinColumns = @JoinColumn(name = "envio_id")
     )
