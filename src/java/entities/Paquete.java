@@ -5,10 +5,8 @@
  */
 package entities;
 
-import entities.PackageSize;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import static javax.persistence.CascadeType.ALL;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,12 +19,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -37,27 +33,27 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(
         name = "findAll",
-        query = "SELECT p FROM PackageEntity p"
+        query = "SELECT p FROM Paquete p"
     ),
     @NamedQuery(
         name = "findBySize",
-        query = "SELECT p FROM PackageEntity p WHERE p.size = :size"
+        query = "SELECT p FROM Paquete p WHERE p.size = :size"
     ),
     @NamedQuery(
         name = "findByDateRange",
-        query = "SELECT p FROM PackageEntity p WHERE p.creationDate BETWEEN :startDate AND :endDate"
+        query = "SELECT p FROM Paquete p WHERE p.creationDate BETWEEN :startDate AND :endDate"
     ),
     @NamedQuery(
         name = "findByName",
-        query = "SELECT p FROM PackageEntity p WHERE LOWER(p.sender) LIKE LOWER(:name) OR LOWER(p.receiver) LIKE LOWER(:name)"
+        query = "SELECT p FROM Paquete p WHERE LOWER(p.sender) LIKE LOWER(:name) OR LOWER(p.receiver) LIKE LOWER(:name)"
     ),
     @NamedQuery(
         name = "findAfterDate",
-        query = "SELECT p FROM PackageEntity p WHERE p.creationDate >= :startDate"
+        query = "SELECT p FROM Paquete p WHERE p.creationDate >= :startDate"
     ),
     @NamedQuery(
         name = "findBeforeDate",
-        query = "SELECT p FROM PackageEntity p WHERE p.creationDate <= :endDate"
+        query = "SELECT p FROM Paquete p WHERE p.creationDate <= :endDate"
     )
 })
 
@@ -65,7 +61,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Entity
 @Table(schema = "FleetIQ", name = "package")
 @XmlRootElement
-public class Package implements Serializable {
+public class Paquete implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -80,7 +76,7 @@ public class Package implements Serializable {
     private Date creationDate;
     private boolean fragile;
 
-    public Package() {
+    public Paquete() {
     }
 
     @ManyToOne(fetch = EAGER, cascade = ALL)

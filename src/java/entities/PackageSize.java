@@ -5,10 +5,13 @@
  */
 package entities;
 
+import javax.xml.bind.annotation.XmlEnum;
+
 /**
  *
  * @author Omar
  */
+@XmlEnum
 public enum  PackageSize {
     SMALL,
     MEDIUM,

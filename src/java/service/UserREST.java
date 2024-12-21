@@ -6,7 +6,11 @@
 package service;
 
 import entities.User;
+import exception.CreateException;
+import exception.DeleteException;
 import exception.EmailAlreadyExistsException;
+import exception.SelectException;
+import exception.UpdateException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +47,7 @@ public class UserREST extends AbstractFacade<User> {
     @POST
     @Consumes({MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_XML})
-    public User createUser(User user) {
+    public User createUser(User user) throws CreateException {
         try {
             User existeUser = em.createNamedQuery("findUserByEmail", User.class)
                             .setParameter("email", user.getEmail())
@@ -62,34 +66,34 @@ public class UserREST extends AbstractFacade<User> {
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML})
-    public void edit(@PathParam("id") Long id, User entity) {
+    public void edit(@PathParam("id") Long id, User entity) throws UpdateException {
         super.edit(entity);
     }
 
     @DELETE
     @Path("{id}")
-    public void remove(@PathParam("id") Long id) {
+    public void remove(@PathParam("id") Long id) throws SelectException, DeleteException {
         super.remove(super.find(id));
     }
 
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML})
-    public User find(@PathParam("id") Long id) {
+    public User find(@PathParam("id") Long id) throws SelectException {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML})
-    public List<User> findAll() {
+    public List<User> findAll() throws SelectException {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML})
-    public List<User> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<User> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) throws SelectException {
         return super.findRange(new int[]{from, to});
     }
 

@@ -38,16 +38,16 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(
             name = "findAllUsers",
-            query = "Select u From UserEntity u")
+            query = "Select u From User u")
     ,
    @NamedQuery(
             name = "signin",
-            query = "SELECT u FROM UserEntity u WHERE u.email = :userEmail AND u.password = :userPassword"
+            query = "SELECT u FROM User u WHERE u.email = :userEmail AND u.password = :userPassword"
     )
     ,
    @NamedQuery(
             name = "findUserByEmail",
-            query = "SELECT u FROM UserEntity u WHERE u.email=:userEmail")
+            query = "SELECT u FROM User u WHERE u.email=:userEmail")
    
 })
 

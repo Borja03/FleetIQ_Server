@@ -6,6 +6,10 @@
 package service;
 
 import entities.EnvioRutaVehiculo;
+import exception.CreateException;
+import exception.DeleteException;
+import exception.SelectException;
+import exception.UpdateException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -38,41 +42,41 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
     @POST
     @Override
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(EnvioRutaVehiculo entity) {
+    public void create(EnvioRutaVehiculo entity) throws CreateException {
         super.create(entity);
     }
 
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Integer id, EnvioRutaVehiculo entity) {
+    public void edit(@PathParam("id") Integer id, EnvioRutaVehiculo entity) throws UpdateException {
         super.edit(entity);
     }
 
     @DELETE
     @Path("{id}")
-    public void remove(@PathParam("id") Integer id) {
+    public void remove(@PathParam("id") Integer id) throws SelectException, DeleteException {
         super.remove(super.find(id));
     }
 
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public EnvioRutaVehiculo find(@PathParam("id") Integer id) {
+    public EnvioRutaVehiculo find(@PathParam("id") Integer id) throws SelectException {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<EnvioRutaVehiculo> findAll() {
+    public List<EnvioRutaVehiculo> findAll() throws SelectException {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<EnvioRutaVehiculo> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<EnvioRutaVehiculo> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) throws SelectException {
         return super.findRange(new int[]{from, to});
     }
 

@@ -49,7 +49,7 @@ public class Envio implements Serializable {
     private List<User> usersList;
 
     @OneToMany(cascade=ALL,mappedBy="envio",fetch=EAGER)
-    private List<Package> packageList;
+    private List<Paquete> packageList;
     
  
     // Getters y Setters
