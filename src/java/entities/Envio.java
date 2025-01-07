@@ -71,12 +71,18 @@ public class Envio implements Serializable {
     private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(mappedBy = "enviosList")
-    private List<User> usersList;
+    private List<User> userList;
 
     @OneToMany(cascade=ALL,mappedBy="envio",fetch=EAGER)
     private List<Paquete> packageList;
-    
-    private List<User> userList;
+
+    public EnvioRutaVehiculo getEnvioRutaVehiculo() {
+        return envioRutaVehiculo;
+    }
+
+    public void setEnvioRutaVehiculo(EnvioRutaVehiculo envioRutaVehiculo) {
+        this.envioRutaVehiculo = envioRutaVehiculo;
+    }
 
     @XmlTransient
     public List<Paquete> getPackageList() {

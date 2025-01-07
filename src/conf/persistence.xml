@@ -7,7 +7,10 @@
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.SunOneJtaPlatform"/>
+<<<<<<< HEAD
       <property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>
+=======
+>>>>>>> 3e329baea44c2776332ea2aa11158eb14c6df31f
     </properties>
   </persistence-unit>
 </persistence>
