@@ -10,6 +10,25 @@ import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+    @NamedQueries({
+        @NamedQuery(
+            name = "Envio.findAll",
+            query = "SELECT e FROM Envio e"
+        ),
+        @NamedQuery(
+            name = "Ruta.filterByDates",
+            query = "SELECT e FROM Envio e WHERE e.fechaEnvio BETWEEN :firstDate AND :secondDate"
+        ),
+        @NamedQuery(
+            name = "Ruta.filterEstado",
+            query = "SELECT e FROM Envio e WHERE e.estado = :estado"
+        ),
+        @NamedQuery(
+            name = "Ruta.filterNumPaquetes",
+            query = "SELECT e FROM Envio e WHERE e.numPaquetes = :numPaquetes"
+        ),
+    })
+
 /**
  * Entidad JPA que representa un Envío.
  */
