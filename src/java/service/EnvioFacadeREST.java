@@ -29,7 +29,7 @@ import javax.ws.rs.core.MediaType;
  * @author Omar
  */
 @Stateless
-@Path("entities.envio")
+@Path("envio")
 public class EnvioFacadeREST extends AbstractFacade<Envio> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")

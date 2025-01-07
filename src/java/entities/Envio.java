@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.XmlTransient;
  * Entidad JPA que representa un Envío.
  */
 @Entity
-@Table(name = "envios", schema = "FleetIQ")
+@Table(name = "envio", schema = "FleetIQ")
 @XmlRootElement
 public class Envio implements Serializable {
 
@@ -71,12 +71,11 @@ public class Envio implements Serializable {
     private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(mappedBy = "enviosList")
-    private List<User> usersList;
+    private List<User> userList;
 
     @OneToMany(cascade=ALL,mappedBy="envio",fetch=EAGER)
     private List<Paquete> packageList;
     
-    private List<User> userList;
 
     @XmlTransient
     public List<Paquete> getPackageList() {
