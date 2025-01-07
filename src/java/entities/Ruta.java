@@ -83,9 +83,8 @@ public class Ruta implements Serializable {
     @Column(name = "num_vehiculos", nullable = true)
     private Integer numVehiculos;
 
-    // OneToMany relationship with RutaVehiculo
-    @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<EnvioRutaVehiculo> envioRutaVehiculos;
+    @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+private List<EnvioRutaVehiculo> envioRutaVehiculos;
 
     // Getters and Setters
     public Integer getLocalizador() {
@@ -151,6 +150,11 @@ public class Ruta implements Serializable {
     public void setEnvioRutaVehiculos(List<EnvioRutaVehiculo> envioRutaVehiculos) {
         this.envioRutaVehiculos = envioRutaVehiculos;
     }
+    
+    public Integer getId() {
+    return localizador;
+}
+
 
     @Override
     public String toString() {
