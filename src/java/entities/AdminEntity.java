@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @DiscriminatorValue("Admin")
 @XmlRootElement
-public class AdminEntity extends UserEntity  implements Serializable {
+public class AdminEntity extends User  implements Serializable {
 
     private Date ultimoInicioSesion;
 

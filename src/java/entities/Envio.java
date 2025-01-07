@@ -1,5 +1,6 @@
 package entities;
 
+import entities.*;
 import entities.Estado;
 import java.io.Serializable;
 import javax.persistence.*;
@@ -65,36 +66,33 @@ public class Envio implements Serializable {
     @Column(name = "vehiculo", length = 10)
     private String vehiculo;
 
-    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "envio")
-    private List<PackageEntity> packageList;
-
-    @ManyToOne(fetch = EAGER, cascade = ALL)
-    @JoinColumn(name = "envio_ruta_vehiculo_id")
+     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "envio_ruta_vehiculo_id", nullable = false)
     private EnvioRutaVehiculo envioRutaVehiculo;
 
-    @ManyToMany(fetch = EAGER, cascade = ALL)
-    @JoinTable(
-            name = "envios_usuarios", // Nombre de la tabla intermedia
-            joinColumns = @JoinColumn(name = "envio_id"), // Columna que referencia la tabla 'envios'
-            inverseJoinColumns = @JoinColumn(name = "user_id") // Columna que referencia la tabla 'user_entity'
-    )
-    private List<UserEntity> userList;
+    @ManyToMany(mappedBy = "enviosList")
+    private List<User> usersList;
+
+    @OneToMany(cascade=ALL,mappedBy="envio",fetch=EAGER)
+    private List<Paquete> packageList;
+    
+    private List<User> userList;
 
     @XmlTransient
-    public List<PackageEntity> getPackageList() {
+    public List<Paquete> getPackageList() {
         return packageList;
     }
 
-    public void setPackageList(List<PackageEntity> packageList) {
+    public void setPackageList(List<Paquete> packageList) {
         this.packageList = packageList;
     }
 
     @XmlTransient
-    public List<UserEntity> getUserList() {
+    public List<User> getUserList() {
         return userList;
     }
 
-    public void setUserList(List<UserEntity> userList) {
+    public void setUserList(List<User> userList) {
         this.userList = userList;
     }
 

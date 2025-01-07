@@ -3,7 +3,6 @@ package entities;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.*;
-import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -34,7 +33,7 @@ public class Vehiculo implements Serializable {
     @Column(name = "estado", nullable = false, length = 20)
     private String estado; // Ejemplo: "Disponible", "En uso", "Mantenimiento"
 
-    @OneToMany(fetch = EAGER, cascade = CascadeType.ALL, mappedBy = "vehiculo")
+    @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<EnvioRutaVehiculo> envioRutaVehiculoList;
 
     // Getters y Setters

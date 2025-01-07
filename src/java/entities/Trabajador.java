@@ -5,7 +5,6 @@
  */
 package entities;
 
-import entities.UserEntity;
 import java.io.Serializable;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
@@ -19,7 +18,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @DiscriminatorValue("Trabajador")
 @XmlRootElement
-public class TrabajadorEntity extends UserEntity implements Serializable {
+public class Trabajador extends User implements Serializable {
 
     private String departamento;
 
@@ -41,10 +40,10 @@ public class TrabajadorEntity extends UserEntity implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof TrabajadorEntity)) {
+        if (!(object instanceof Trabajador)) {
             return false;
         }
-        TrabajadorEntity other = (TrabajadorEntity) object;
+        Trabajador other = (Trabajador) object;
 //        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
 //            return false;
 //        }
@@ -53,7 +52,7 @@ public class TrabajadorEntity extends UserEntity implements Serializable {
 
     @Override
     public String toString() {
-      //  return "entitie.TrabajadorEntity[ id=" + id + " ]";
+      //  return "entitie.Trabajador[ id=" + id + " ]";
       return null;
     }
 

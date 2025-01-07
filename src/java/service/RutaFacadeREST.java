@@ -6,6 +6,10 @@
 package service;
 
 import entities.Ruta;
+import exception.CreateException;
+import exception.DeleteException;
+import exception.SelectException;
+import exception.UpdateException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -22,13 +26,13 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author 2dam
+ * @author Omar
  */
 @Stateless
-@Path("entities.ruta")
+@Path("ruta")
 public class RutaFacadeREST extends AbstractFacade<Ruta> {
 
-    @PersistenceContext(unitName = "JavaFX-WebApplicationUD5ExamplePU")
+    @PersistenceContext(unitName = "FleetIQ_ServerPU")
     private EntityManager em;
 
     public RutaFacadeREST() {
@@ -38,41 +42,41 @@ public class RutaFacadeREST extends AbstractFacade<Ruta> {
     @POST
     @Override
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(Ruta entity) {
+    public void create(Ruta entity) throws CreateException {
         super.create(entity);
     }
 
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Integer id, Ruta entity) {
+    public void edit(@PathParam("id") Integer id, Ruta entity) throws UpdateException {
         super.edit(entity);
     }
 
     @DELETE
     @Path("{id}")
-    public void remove(@PathParam("id") Integer id) {
+    public void remove(@PathParam("id") Integer id) throws SelectException, DeleteException {
         super.remove(super.find(id));
     }
 
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Ruta find(@PathParam("id") Integer id) {
+    public Ruta find(@PathParam("id") Integer id) throws SelectException {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Ruta> findAll() {
+    public List<Ruta> findAll() throws SelectException {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Ruta> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<Ruta> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) throws SelectException {
         return super.findRange(new int[]{from, to});
     }
 
@@ -83,81 +87,9 @@ public class RutaFacadeREST extends AbstractFacade<Ruta> {
         return String.valueOf(super.count());
     }
 
-    // Filter by dates
-    @GET
-    @Path("filterByDates/{firstDate}/{secondDate}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Ruta> filterByDates(
-            @PathParam("firstDate") String firstDate,
-            @PathParam("secondDate") String secondDate) {
-        return em.createNamedQuery("Ruta.filterByDates", Ruta.class)
-                .setParameter("firstDate", java.sql.Date.valueOf(firstDate))
-                .setParameter("secondDate", java.sql.Date.valueOf(secondDate))
-                .getResultList();
-    }
-
-    // Filter by tiempo > X
-    @GET
-    @Path("filterTiempoMayor/{tiempo}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Ruta> filterTiempoMayor(@PathParam("tiempo") Integer tiempo) {
-        return em.createNamedQuery("Ruta.filterTiempoMayor", Ruta.class)
-                .setParameter("tiempo", tiempo)
-                .getResultList();
-    }
-
-    // Filter by tiempo < X
-    @GET
-    @Path("filterTiempoMenor/{tiempo}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Ruta> filterTiempoMenor(@PathParam("tiempo") Integer tiempo) {
-        return em.createNamedQuery("Ruta.filterTiempoMenor", Ruta.class)
-                .setParameter("tiempo", tiempo)
-                .getResultList();
-    }
-
-    // Filter by tiempo = X
-    @GET
-    @Path("filterTiempoIgual/{tiempo}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Ruta> filterTiempoIgual(@PathParam("tiempo") Integer tiempo) {
-        return em.createNamedQuery("Ruta.filterTiempoIgual", Ruta.class)
-                .setParameter("tiempo", tiempo)
-                .getResultList();
-    }
-
-    // Filter by distancia > X
-    @GET
-    @Path("filterDistanciaMayor/{distancia}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Ruta> filterDistanciaMayor(@PathParam("distancia") Float distancia) {
-        return em.createNamedQuery("Ruta.filterDistanciaMayor", Ruta.class)
-                .setParameter("distancia", distancia)
-                .getResultList();
-    }
-
-    // Filter by distancia < X
-    @GET
-    @Path("filterDistanciaMenor/{distancia}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Ruta> filterDistanciaMenor(@PathParam("distancia") Float distancia) {
-        return em.createNamedQuery("Ruta.filterDistanciaMenor", Ruta.class)
-                .setParameter("distancia", distancia)
-                .getResultList();
-    }
-
-    // Filter by distancia = X
-    @GET
-    @Path("filterDistanciaIgual/{distancia}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Ruta> filterDistanciaIgual(@PathParam("distancia") Float distancia) {
-        return em.createNamedQuery("Ruta.filterDistanciaIgual", Ruta.class)
-                .setParameter("distancia", distancia)
-                .getResultList();
-    }
-
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
+    
 }

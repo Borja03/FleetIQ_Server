@@ -6,6 +6,10 @@
 package service;
 
 import entities.Envio;
+import exception.CreateException;
+import exception.DeleteException;
+import exception.SelectException;
+import exception.UpdateException;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -22,13 +26,13 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author 2dam
+ * @author Omar
  */
 @Stateless
-@Path("entities.envio")
+@Path("envio")
 public class EnvioFacadeREST extends AbstractFacade<Envio> {
 
-    @PersistenceContext(unitName = "JavaFX-WebApplicationUD5ExamplePU")
+    @PersistenceContext(unitName = "FleetIQ_ServerPU")
     private EntityManager em;
 
     public EnvioFacadeREST() {
@@ -38,41 +42,41 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
     @POST
     @Override
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(Envio entity) {
+    public void create(Envio entity) throws CreateException {
         super.create(entity);
     }
 
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Integer id, Envio entity) {
+    public void edit(@PathParam("id") Integer id, Envio entity) throws UpdateException {
         super.edit(entity);
     }
 
     @DELETE
     @Path("{id}")
-    public void remove(@PathParam("id") Integer id) {
+    public void remove(@PathParam("id") Integer id) throws SelectException, DeleteException {
         super.remove(super.find(id));
     }
 
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Envio find(@PathParam("id") Integer id) {
+    public Envio find(@PathParam("id") Integer id) throws SelectException {
         return super.find(id);
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Envio> findAll() {
+    public List<Envio> findAll() throws SelectException {
         return super.findAll();
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Envio> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
+    public List<Envio> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) throws SelectException {
         return super.findRange(new int[]{from, to});
     }
 
