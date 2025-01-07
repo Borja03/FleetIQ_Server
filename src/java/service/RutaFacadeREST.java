@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author Omar
+ * @author Borja
  */
 @Stateless
 @Path("entities.ruta")

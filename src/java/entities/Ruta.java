@@ -1,13 +1,51 @@
 package entities;
 
 import java.io.Serializable;
+
+import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
+
+
+@NamedQueries({
+    @NamedQuery(
+        name = "Ruta.findAll",
+        query = "SELECT r FROM Ruta r"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterBy2Dates",
+        query = "SELECT r FROM Ruta r WHERE r.fechaCreacion BETWEEN :firstDate AND :secondDate"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterTiempoMayor",
+        query = "SELECT r FROM Ruta r WHERE r.tiempo > :tiempo"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterTiempoMenor",
+        query = "SELECT r FROM Ruta r WHERE r.tiempo < :tiempo"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterTiempoIgual",
+        query = "SELECT r FROM Ruta r WHERE r.tiempo = :tiempo"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterDistanciaMayor",
+        query = "SELECT r FROM Ruta r WHERE r.distancia > :distancia"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterDistanciaMenor",
+        query = "SELECT r FROM Ruta r WHERE r.distancia < :distancia"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterDistanciaIgual",
+        query = "SELECT r FROM Ruta r WHERE r.distancia = :distancia"
+    )
+})
+
 
 /**
- * Entidad JPA que representa una Ruta.
+ * Entidad JPA que representa una ruta.
  */
 @Entity
 @Table(name = "ruta", schema = "FleetIQ")
@@ -16,81 +54,107 @@ public class Ruta implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer localizador;
 
-    @Column(name = "nombre", nullable = false, length = 100)
-    private String nombre;
+    @Column(name = "origen")
+    private String origen;
 
-    @Column(name = "descripcion", nullable = true, length = 255)
-    private String descripcion;
+    @Column(name = "destino")
+    private String destino;
 
-    @Column(name = "duracion_estimada", nullable = true)
-    private Double duracionEstimada;
+    @Column(name = "distancia")
+    private Float distancia;
 
-    @Column(name = "distancia", nullable = true)
-    private Double distancia;
+    @Column(name = "tiempo", nullable = false)
+    private Integer tiempo;
+    
+    @Temporal(TemporalType.DATE)
+    @Column(name = "fecha_creacion", nullable = false)
+    private Date fechaCreacion;
 
-    @OneToMany(mappedBy = "ruta", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<EnvioRutaVehiculo> envioRutaVehiculoList;
-
-    // Getters y Setters
-    public Integer getId() {
-        return id;
+    public Integer getNumVehiculos() {
+        return numVehiculos;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setNumVehiculos(Integer numVehiculos) {
+        this.numVehiculos = numVehiculos;
     }
 
-    public String getNombre() {
-        return nombre;
+    @Column(name = "num_vehiculos", nullable = true)
+    private Integer numVehiculos;
+
+    // OneToMany relationship with RutaVehiculo
+    @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<EnvioRutaVehiculo> envioRutaVehiculos;
+
+    // Getters and Setters
+    public Integer getLocalizador() {
+        return localizador;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setLocalizador(Integer localizador) {
+        this.localizador = localizador;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getOrigen() {
+        return origen;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setOrigen(String origen) {
+        this.origen = origen;
     }
 
-    public Double getDuracionEstimada() {
-        return duracionEstimada;
+    public String getDestino() {
+        return destino;
     }
 
-    public void setDuracionEstimada(Double duracionEstimada) {
-        this.duracionEstimada = duracionEstimada;
+    public void setDestino(String destino) {
+        this.destino = destino;
     }
 
-    public Double getDistancia() {
+    public Float getDistancia() {
         return distancia;
     }
 
-    public void setDistancia(Double distancia) {
+    public void setDistancia(Float distancia) {
         this.distancia = distancia;
     }
 
-    @XmlTransient
-    public List<EnvioRutaVehiculo> getEnvioRutaVehiculoList() {
-        return envioRutaVehiculoList;
+    public Integer getTiempo() {
+        return tiempo;
     }
 
-    public void setEnvioRutaVehiculoList(List<EnvioRutaVehiculo> envioRutaVehiculoList) {
-        this.envioRutaVehiculoList = envioRutaVehiculoList;
+    public void setTiempo(Integer tiempo) {
+        this.tiempo = tiempo;
+    }
+
+    public Date getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(Date fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    public List<EnvioRutaVehiculo> getRutaVehiculos() {
+        return envioRutaVehiculos;
+    }
+
+    public void setRutaVehiculos(List<EnvioRutaVehiculo> rutaVehiculos) {
+        this.envioRutaVehiculos = rutaVehiculos;
+    }
+
+    public List<EnvioRutaVehiculo> getEnvioRutaVehiculos() {
+        return envioRutaVehiculos;
+    }
+
+    public void setEnvioRutaVehiculos(List<EnvioRutaVehiculo> envioRutaVehiculos) {
+        this.envioRutaVehiculos = envioRutaVehiculos;
     }
 
     @Override
     public String toString() {
-        return "Ruta{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                ", duracionEstimada=" + duracionEstimada +
-                ", distancia=" + distancia +
-                '}';
+        return "Ruta{" + "localizador=" + localizador + ", origen=" + origen + ", destino=" + destino + ", distancia=" + distancia + ", tiempo=" + tiempo + ", fechaCreacion=" + fechaCreacion + ", numVehiculos=" + numVehiculos + ", envioRutaVehiculos=" + envioRutaVehiculos + '}';
     }
+    
 }
