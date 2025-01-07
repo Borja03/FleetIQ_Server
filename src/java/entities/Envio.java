@@ -1,13 +1,34 @@
 package entities;
 
+import entities.*;
+import entities.Estado;
 import java.io.Serializable;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.*;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+
+    @NamedQueries({
+        @NamedQuery(
+            name = "Envio.findAll",
+            query = "SELECT e FROM Envio e"
+        ),
+        @NamedQuery(
+            name = "Ruta.filterByDates",
+            query = "SELECT e FROM Envio e WHERE e.fechaEnvio BETWEEN :firstDate AND :secondDate"
+        ),
+        @NamedQuery(
+            name = "Ruta.filterEstado",
+            query = "SELECT e FROM Envio e WHERE e.estado = :estado"
+        ),
+        @NamedQuery(
+            name = "Ruta.filterNumPaquetes",
+            query = "SELECT e FROM Envio e WHERE e.numPaquetes = :numPaquetes"
+        ),
+    })
 
 /**
  * Entidad JPA que representa un Envío.
@@ -21,37 +42,59 @@ public class Envio implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "descripcion", nullable = false, length = 255)
-    private String descripcion;
-
-    @Column(name = "destinatario", nullable = false, length = 100)
-    private String destinatario;
-
-    @Column(name = "direccion_entrega", nullable = false, length = 255)
-    private String direccionEntrega;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "fecha_envio", nullable = false)
+    @Temporal(TemporalType.DATE)
+    @Column(name = "fecha_envio", nullable = true)
     private Date fechaEnvio;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "fecha_entrega", nullable = true)
+    @Temporal(TemporalType.DATE)
+    @Column(name = "fecha_entrega")
     private Date fechaEntrega;
 
-    @Column(name = "estado", nullable = false, length = 50)
-    private String estado; // Ejemplo: "Pendiente", "En tránsito", "Entregado"
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = true)
+    private Estado estado;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @Column(name = "num_paquetes", nullable = true)
+    private Integer numPaquetes;
+
+    @Column(name = "creador_envio", nullable = true, length = 30)
+    private String creadorEnvio;
+
+    @Column(name = "ruta", length = 7)
+    private String ruta;
+
+    @Column(name = "vehiculo", length = 10)
+    private String vehiculo;
+
+     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "envio_ruta_vehiculo_id", nullable = false)
     private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(mappedBy = "enviosList")
-    private List<User> usersList;
+    private List<User> userList;
 
     @OneToMany(cascade=ALL,mappedBy="envio",fetch=EAGER)
     private List<Paquete> packageList;
     
- 
+
+    @XmlTransient
+    public List<Paquete> getPackageList() {
+        return packageList;
+    }
+
+    public void setPackageList(List<Paquete> packageList) {
+        this.packageList = packageList;
+    }
+
+    @XmlTransient
+    public List<User> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
+    }
+
     // Getters y Setters
     public Integer getId() {
         return id;
@@ -59,30 +102,6 @@ public class Envio implements Serializable {
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
-    public String getDestinatario() {
-        return destinatario;
-    }
-
-    public void setDestinatario(String destinatario) {
-        this.destinatario = destinatario;
-    }
-
-    public String getDireccionEntrega() {
-        return direccionEntrega;
-    }
-
-    public void setDireccionEntrega(String direccionEntrega) {
-        this.direccionEntrega = direccionEntrega;
     }
 
     public Date getFechaEnvio() {
@@ -101,42 +120,48 @@ public class Envio implements Serializable {
         this.fechaEntrega = fechaEntrega;
     }
 
-    public String getEstado() {
+    public Estado getEstado() {
         return estado;
     }
 
-    public void setEstado(String estado) {
+    public void setEstado(Estado estado) {
         this.estado = estado;
     }
 
-    public EnvioRutaVehiculo getEnvioRutaVehiculo() {
-        return envioRutaVehiculo;
+    public Integer getNumPaquetes() {
+        return numPaquetes;
     }
 
-    public void setEnvioRutaVehiculo(EnvioRutaVehiculo envioRutaVehiculo) {
-        this.envioRutaVehiculo = envioRutaVehiculo;
+    public void setNumPaquetes(Integer numPaquetes) {
+        this.numPaquetes = numPaquetes;
     }
 
-    @XmlTransient
-    public List<User> getUsersList() {
-        return usersList;
+    public String getCreadorEnvio() {
+        return creadorEnvio;
     }
 
-    public void setUsersList(List<User> usersList) {
-        this.usersList = usersList;
+    public void setCreadorEnvio(String creadorEnvio) {
+        this.creadorEnvio = creadorEnvio;
+    }
+
+    public String getRuta() {
+        return ruta;
+    }
+
+    public void setRuta(String ruta) {
+        this.ruta = ruta;
+    }
+
+    public String getVehiculo() {
+        return vehiculo;
+    }
+
+    public void setVehiculo(String vehiculo) {
+        this.vehiculo = vehiculo;
     }
 
     @Override
     public String toString() {
-        return "Envio{"
-                + "id=" + id
-                + ", descripcion='" + descripcion + '\''
-                + ", destinatario='" + destinatario + '\''
-                + ", direccionEntrega='" + direccionEntrega + '\''
-                + ", fechaEnvio=" + fechaEnvio
-                + ", fechaEntrega=" + fechaEntrega
-                + ", estado='" + estado + '\''
-                + ", envioRutaVehiculo=" + (envioRutaVehiculo != null ? envioRutaVehiculo.getId() : "null")
-                + '}';
+        return "Envio{" + "id=" + id + ", fechaEnvio=" + fechaEnvio + ", fechaEntrega=" + fechaEntrega + ", estado=" + estado + ", numPaquetes=" + numPaquetes + ", creadorEnvio=" + creadorEnvio + ", ruta=" + ruta + ", vehiculo=" + vehiculo + '}';
     }
 }
