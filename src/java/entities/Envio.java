@@ -66,7 +66,7 @@ public class Envio implements Serializable {
     @Column(name = "vehiculo", length = 10)
     private String vehiculo;
 
-     @ManyToOne(fetch = FetchType.LAZY)
+     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "envio_ruta_vehiculo_id", nullable = false)
     private EnvioRutaVehiculo envioRutaVehiculo;
 
@@ -86,6 +86,14 @@ public class Envio implements Serializable {
         this.packageList = packageList;
     }
 
+    public EnvioRutaVehiculo getEnvioRutaVehiculo() {
+        return envioRutaVehiculo;
+    }
+
+    public void setEnvioRutaVehiculo(EnvioRutaVehiculo envioRutaVehiculo) {
+        this.envioRutaVehiculo = envioRutaVehiculo;
+    }
+    
     @XmlTransient
     public List<User> getUserList() {
         return userList;
