@@ -34,7 +34,7 @@ import javax.ws.rs.core.MediaType;
  * @author Omar
  */
 @Stateless
-@Path("entities.userentity")
+@Path("user")
 public class UserREST extends AbstractFacade<User> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
@@ -60,20 +60,53 @@ public class UserREST extends AbstractFacade<User> {
         } catch (EmailAlreadyExistsException ex) {
             Logger.getLogger(UserREST.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         return null;
     }
 
+    @POST
+    @Consumes({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML})
+    public User logInUser(String email, String password) {
+        User user = null;
+        //decifrar password 
+        // hash password
+        try {
+            user = (User) em.createNamedQuery("login")
+                            .setParameter("userEmail", email)
+                            .setParameter("userPassword", password)
+                            .getSingleResult();
+        } catch (Exception ex) {
+            //loggers
+        }
+
+        return user;
+    }
+
+    @POST
+    @Consumes({MediaType.APPLICATION_XML})
+    public void resetPassword(String email) {
+
+        try {
+            User user = (User) em.createNamedQuery("findByEmail")
+                            .setParameter("userEmail", email)
+                            .getSingleResult();
+            if (user != null) {
+                //edit user with new data
+                //decifrar password 
+                // hash password
+            }
+        } catch (Exception ex) {
+        }
+    }
+
+    
+    
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML})
     public void edit(@PathParam("id") Long id, User entity) throws UpdateException {
         super.edit(entity);
-    }
-
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") Long id) throws SelectException, DeleteException {
-        super.remove(super.find(id));
     }
 
     @GET
@@ -82,27 +115,6 @@ public class UserREST extends AbstractFacade<User> {
     public User find(@PathParam("id") Long id) throws SelectException {
         return super.find(id);
     }
-
-    @GET
-    @Override
-    @Produces({MediaType.APPLICATION_XML})
-    public List<User> findAll() throws SelectException {
-        return super.findAll();
-    }
-
-    @GET
-    @Path("{from}/{to}")
-    @Produces({MediaType.APPLICATION_XML})
-    public List<User> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) throws SelectException {
-        return super.findRange(new int[]{from, to});
-    }
-
-    //@GET
-    //@Path("count")
-    //@Produces(MediaType.TEXT_PLAIN)
-    //public String countREST() {
-    //    return String.valueOf(super.count());
-    //}
 
     @Override
     protected EntityManager getEntityManager() {
