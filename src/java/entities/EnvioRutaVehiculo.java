@@ -5,6 +5,13 @@ import java.util.Date;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
 
+
+@NamedQueries({
+    @NamedQuery(
+        name = "EnvioRutaVehiculo.countByRutaId",
+        query = "SELECT COUNT(e) FROM EnvioRutaVehiculo e WHERE e.ruta.localizador = :rutaId"
+    )
+})
 /**
  * Entidad JPA que representa la relación entre Envío, Ruta y Vehículo.
  */

@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author Omar
+ * @author Borja
  */
 @Stateless
 @Path("entities.enviorutavehiculo")
@@ -87,9 +87,18 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
         return String.valueOf(super.count());
     }
 
+    @GET
+    @Path("countByRutaId/{rutaId}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String countByRutaId(@PathParam("rutaId") Integer rutaId) {
+        Long count = em.createNamedQuery("EnvioRutaVehiculo.countByRutaId", Long.class)
+                       .setParameter("rutaId", rutaId)
+                       .getSingleResult();
+        return String.valueOf(count);
+    }
+
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
-    
 }
