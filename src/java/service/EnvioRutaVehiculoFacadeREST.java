@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package service;
 
 import entities.EnvioRutaVehiculo;
@@ -10,6 +5,7 @@ import exception.CreateException;
 import exception.DeleteException;
 import exception.SelectException;
 import exception.UpdateException;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -70,7 +66,8 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<EnvioRutaVehiculo> findAll() throws SelectException {
-        return super.findAll();
+        // Usar la consulta "findAll" definida en la entidad
+        return em.createNamedQuery("EnvioRutaVehiculo.findAll", EnvioRutaVehiculo.class).getResultList();
     }
 
     @GET
@@ -92,9 +89,36 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
     @Produces(MediaType.TEXT_PLAIN)
     public String countByRutaId(@PathParam("rutaId") Integer rutaId) {
         Long count = em.createNamedQuery("EnvioRutaVehiculo.countByRutaId", Long.class)
-                       .setParameter("rutaId", rutaId)
-                       .getSingleResult();
+                .setParameter("rutaId", rutaId)
+                .getSingleResult();
         return String.valueOf(count);
+    }
+
+    @POST
+    @Path("assignVehicleToRoute")
+    @Consumes({MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_JSON})
+    public EnvioRutaVehiculo assignVehicleToRoute(EnvioRutaVehiculo input) throws CreateException {
+        try {
+            if (input.getRuta() == null || input.getVehiculo() == null) {
+                throw new IllegalArgumentException("La ruta y el vehículo son obligatorios.");
+            }
+
+            // Asegurarse de que el envío no sea null
+            if (input.getEnvio() == null) {
+                throw new IllegalArgumentException("El envío es obligatorio.");
+            }
+
+            // Asignar la fecha local del sistema
+            input.setFechaAsignacion(new Date());
+
+            // Insertar en la base de datos
+            em.persist(input);
+
+            return input; // Devolver el objeto creado con su ID generado
+        } catch (Exception e) {
+            throw new CreateException("Error al asignar vehículo a la ruta: " + e.getMessage());
+        }
     }
 
     @Override
