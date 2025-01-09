@@ -26,10 +26,10 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author Omar
+ * @author Borja
  */
 @Stateless
-@Path("entities.ruta")
+@Path("ruta")
 public class RutaFacadeREST extends AbstractFacade<Ruta> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
