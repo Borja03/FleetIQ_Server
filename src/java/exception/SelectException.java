@@ -6,6 +6,8 @@
 
 package exception;
 
+import java.text.ParseException;
+
 /**
  *
  * @author Alder
@@ -28,5 +30,13 @@ public class SelectException extends Exception {
      */
     public SelectException(String msg) {
         super(msg);
+    }
+
+    public SelectException(String invalid_date_format_Expected_format_is_dd, ParseException e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public SelectException(String an_error_occurred_while_processing_the_re, Exception e) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
