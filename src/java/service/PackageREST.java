@@ -36,7 +36,7 @@ import javax.ws.rs.core.MediaType;
  * @author Omar
  */
 @Stateless
-@Path("package")
+@Path("paquete")
 public class PackageREST extends AbstractFacade<Paquete> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")

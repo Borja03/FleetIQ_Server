@@ -104,11 +104,6 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
                 throw new IllegalArgumentException("La ruta y el vehículo son obligatorios.");
             }
 
-            // Asegurarse de que el envío no sea null
-            if (input.getEnvio() == null) {
-                throw new IllegalArgumentException("El envío es obligatorio.");
-            }
-
             // Asignar la fecha local del sistema
             input.setFechaAsignacion(new Date());
 
