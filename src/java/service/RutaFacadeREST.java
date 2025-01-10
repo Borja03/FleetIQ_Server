@@ -26,10 +26,10 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author Omar
+ * @author Borja
  */
 @Stateless
-@Path("entities.ruta")
+@Path("ruta")
 public class RutaFacadeREST extends AbstractFacade<Ruta> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
@@ -87,9 +87,73 @@ public class RutaFacadeREST extends AbstractFacade<Ruta> {
         return String.valueOf(super.count());
     }
 
+    @GET
+    @Path("filterBy2Dates/{firstDate}/{secondDate}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterBy2Dates(@PathParam("firstDate") String firstDate, @PathParam("secondDate") String secondDate) throws SelectException {
+        return em.createNamedQuery("Ruta.filterBy2Dates", Ruta.class)
+                .setParameter("firstDate", java.sql.Date.valueOf(firstDate))
+                .setParameter("secondDate", java.sql.Date.valueOf(secondDate))
+                .getResultList();
+    }
+
+    @GET
+    @Path("filterTiempoMayor/{tiempo}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterTiempoMayor(@PathParam("tiempo") Integer tiempo) throws SelectException {
+        return em.createNamedQuery("Ruta.filterTiempoMayor", Ruta.class)
+                .setParameter("tiempo", tiempo)
+                .getResultList();
+    }
+
+    @GET
+    @Path("filterTiempoMenor/{tiempo}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterTiempoMenor(@PathParam("tiempo") Integer tiempo) throws SelectException {
+        return em.createNamedQuery("Ruta.filterTiempoMenor", Ruta.class)
+                .setParameter("tiempo", tiempo)
+                .getResultList();
+    }
+
+    @GET
+    @Path("filterTiempoIgual/{tiempo}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterTiempoIgual(@PathParam("tiempo") Integer tiempo) throws SelectException {
+        return em.createNamedQuery("Ruta.filterTiempoIgual", Ruta.class)
+                .setParameter("tiempo", tiempo)
+                .getResultList();
+    }
+
+    @GET
+    @Path("filterDistanciaMayor/{distancia}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterDistanciaMayor(@PathParam("distancia") Float distancia) throws SelectException {
+        return em.createNamedQuery("Ruta.filterDistanciaMayor", Ruta.class)
+                .setParameter("distancia", distancia)
+                .getResultList();
+    }
+
+    @GET
+    @Path("filterDistanciaMenor/{distancia}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterDistanciaMenor(@PathParam("distancia") Float distancia) throws SelectException {
+        return em.createNamedQuery("Ruta.filterDistanciaMenor", Ruta.class)
+                .setParameter("distancia", distancia)
+                .getResultList();
+    }
+
+    @GET
+    @Path("filterDistanciaIgual/{distancia}")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Ruta> filterDistanciaIgual(@PathParam("distancia") Float distancia) throws SelectException {
+        return em.createNamedQuery("Ruta.filterDistanciaIgual", Ruta.class)
+                .setParameter("distancia", distancia)
+                .getResultList();
+    }
+
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
-    
 }
+
