@@ -100,5 +100,4 @@ public class EnvioRutaVehiculo implements Serializable {
                 + ", fechaAsignacion=" + fechaAsignacion
                 + '}';
     }
-
 }
