@@ -39,17 +39,18 @@ public class UserREST extends AbstractFacade<User> {
     }
 
     @POST
+    @Path("/register")
     @Consumes({MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_XML})
     public User createUser(User user) throws CreateException {
-        try {        
+        try {
             // Check for existing email
             if (findUserByEmail(user.getEmail()) != null) {
                 throw new CreateException("Email already exists");
             }
 
             // Hash password before storing
-            //user.setPassword(hashPassword(user.getPassword()));
+           // user.setPassword(hashPassword(user.getPassword()));
             super.create(user);
             return user;
 
@@ -59,30 +60,32 @@ public class UserREST extends AbstractFacade<User> {
         }
     }
 
-//    @POST
-//    @Consumes({MediaType.APPLICATION_XML})
-//    @Produces({MediaType.APPLICATION_XML})
-//    public User loginUser(User user) throws SelectException {
-//        try {
-//            User dbUser = findUserByEmail(user.getEmail());
-//            
-//            if (dbUser == null) {
-//                throw new SelectException("Invalid credentials");
-//            }
-//
-//            // Verify password
-//            if (user.getPassword().equals(dbUser.getPassword())) {
-//                throw new SelectException("Invalid credentials");
-//            }
-//            // do not send password 
-//            dbUser.setPassword(null);
-//            return dbUser;
-//
-//        } catch (Exception ex) {
-//            LOGGER.log(Level.SEVERE, "Error during login", ex);
-//            throw new SelectException("Login failed");
-//        }
-//    }
+    @POST
+    @Path("/login")
+    @Consumes({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML})
+    public User loginUser(User user) throws SelectException {
+        try {
+            User dbUser = findUserByEmail(user.getEmail());
+            
+            if (dbUser == null) {
+                throw new SelectException("Invalid credentials");
+            }
+
+            // Verify password
+            if (user.getPassword().equals(dbUser.getPassword())) {
+                throw new SelectException("Invalid credentials");
+            }
+
+            //we do not resend a pass to client 
+            dbUser.setPassword(null);
+            return dbUser;
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error during login", ex);
+            throw new SelectException("Login failed");
+        }
+    }
 
     @PUT
     @Path("/reset-password")
@@ -102,44 +105,14 @@ public class UserREST extends AbstractFacade<User> {
         }
     }
 
-//    @PUT
-//    @Path("/verify-reset")
-//    @Consumes(MediaType.APPLICATION_XML)
-//    public void verifyAndUpdatePassword(User user) throws UpdateException {
-//        try {
-//            User user = findUserByEmail(user.getEmail());
-//            if (user == null) {
-//                throw new UpdateException("Invalid request");
-//            }
-//
-//            if (!SecurityUtils.verifyCode(user.getCode(), user.getVerifcationCode()) || 
-//                SecurityUtils.isCodeExpired(user.getVerificationExpiry())) {
-//                throw new UpdateException("Invalid or expired verification code");
-//            }
-//
-//            if (!isValidPassword(user.getNewPassword())) {
-//                throw new UpdateException("Invalid password format");
-//            }
-//
-//            user.setPassword(SecurityUtils.hashPassword(user.getNewPassword()));
-//            user.setVerifcationCode(null);
-//            super.edit(user);
-//
-//        } catch (Exception ex) {
-//            LOGGER.log(Level.SEVERE, "Error updating password", ex);
-//            throw new UpdateException("Password update failed");
-//        }
-//    }
-
-    @PUT
-    @Path("/update/{id}")
-    @Consumes({MediaType.APPLICATION_XML})
-    public void updateUser(@PathParam("id") Long id, User user) throws UpdateException {
+ 
+    public void updateUser(Long id, User user) throws UpdateException {
         try {
             User existUser = super.find(id);
             if (existUser == null) {
                 throw new UpdateException("User not found");
             }
+            // Only update password
             existUser.setPassword(user.getPassword());
             super.edit(existUser);
         } catch (Exception ex) {
@@ -157,6 +130,7 @@ public class UserREST extends AbstractFacade<User> {
             return null;
         }
     }
+
 
     @Override
     protected EntityManager getEntityManager() {
