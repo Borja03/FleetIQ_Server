@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package service;
 
 import entities.Envio;
@@ -10,10 +5,13 @@ import exception.CreateException;
 import exception.DeleteException;
 import exception.SelectException;
 import exception.UpdateException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -22,6 +20,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -87,9 +86,46 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
         return String.valueOf(super.count());
     }
 
+    @GET
+    @Path("filterByDates")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Envio> filterByDates(@QueryParam("firstDate") String firstDate, @QueryParam("secondDate") String secondDate) throws SelectException {
+        // Conversión de String a Date
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            java.util.Date first = dateFormat.parse(firstDate);
+            java.util.Date second = dateFormat.parse(secondDate);
+
+            Query query = em.createNamedQuery("Ruta.filterByDates");
+            query.setParameter("firstDate", first);
+            query.setParameter("secondDate", second);
+            return query.getResultList();
+
+        } catch (ParseException e) {
+            throw new SelectException("Fecha inválida, por favor use el formato yyyy-MM-dd");
+        }
+    }
+
+    @GET
+    @Path("filterEstado")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Envio> filterEstado(@QueryParam("estado") String estado) throws SelectException {
+        Query query = em.createNamedQuery("Ruta.filterEstado");
+        query.setParameter("estado", estado);
+        return query.getResultList();
+    }
+
+    @GET
+    @Path("filterNumPaquetes")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<Envio> filterNumPaquetes(@QueryParam("numPaquetes") Integer numPaquetes) throws SelectException {
+        Query query = em.createNamedQuery("Ruta.filterNumPaquetes");
+        query.setParameter("numPaquetes", numPaquetes);
+        return query.getResultList();
+    }
+
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
-    
 }

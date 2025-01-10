@@ -11,24 +11,24 @@ import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-    @NamedQueries({
-        @NamedQuery(
-            name = "Envio.findAll",
-            query = "SELECT e FROM Envio e"
-        ),
-        @NamedQuery(
-            name = "Ruta.filterByDates",
-            query = "SELECT e FROM Envio e WHERE e.fechaEnvio BETWEEN :firstDate AND :secondDate"
-        ),
-        @NamedQuery(
-            name = "Ruta.filterEstado",
-            query = "SELECT e FROM Envio e WHERE e.estado = :estado"
-        ),
-        @NamedQuery(
-            name = "Ruta.filterNumPaquetes",
-            query = "SELECT e FROM Envio e WHERE e.numPaquetes = :numPaquetes"
-        ),
-    })
+@NamedQueries({
+    @NamedQuery(
+        name = "Envio.findAll",
+        query = "SELECT e FROM Envio e"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterByDates",
+        query = "SELECT e FROM Envio e WHERE e.fechaEnvio BETWEEN :firstDate AND :secondDate"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterEstado",
+        query = "SELECT e FROM Envio e WHERE e.estado = :estado"
+    ),
+    @NamedQuery(
+        name = "Ruta.filterNumPaquetes",
+        query = "SELECT e FROM Envio e WHERE e.numPaquetes = :numPaquetes"
+    ),
+})
 
 /**
  * Entidad JPA que representa un Envío.
@@ -66,16 +66,17 @@ public class Envio implements Serializable {
     @Column(name = "vehiculo", length = 10)
     private String vehiculo;
 
-     @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "envio_ruta_vehiculo_id", nullable = false)
     private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(mappedBy = "enviosList")
     private List<User> userList;
 
-    @OneToMany(cascade=ALL,mappedBy="envio",fetch=EAGER)
+    @OneToMany(cascade = ALL, mappedBy = "envio", fetch = EAGER)
     private List<Paquete> packageList;
-    
+
+    // Métodos de acceso (getters y setters) de los campos transitorios
 
     @XmlTransient
     public List<Paquete> getPackageList() {
@@ -84,6 +85,14 @@ public class Envio implements Serializable {
 
     public void setPackageList(List<Paquete> packageList) {
         this.packageList = packageList;
+    }
+
+    public EnvioRutaVehiculo getEnvioRutaVehiculo() {
+        return envioRutaVehiculo;
+    }
+
+    public void setEnvioRutaVehiculo(EnvioRutaVehiculo envioRutaVehiculo) {
+        this.envioRutaVehiculo = envioRutaVehiculo;
     }
 
     @XmlTransient
@@ -95,7 +104,8 @@ public class Envio implements Serializable {
         this.userList = userList;
     }
 
-    // Getters y Setters
+    // Getters y Setters de otros campos
+
     public Integer getId() {
         return id;
     }
