@@ -96,8 +96,8 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
 
     @POST
     @Path("assignVehicleToRoute")
-    @Consumes({MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_JSON})
+    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public EnvioRutaVehiculo assignVehicleToRoute(EnvioRutaVehiculo input) throws CreateException {
         try {
             if (input.getRuta() == null || input.getVehiculo() == null) {

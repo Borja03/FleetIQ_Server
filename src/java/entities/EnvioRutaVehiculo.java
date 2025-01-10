@@ -94,10 +94,11 @@ public class EnvioRutaVehiculo implements Serializable {
     public String toString() {
         return "EnvioRutaVehiculo{"
                 + "id=" + id
-                + ", envio=" + (envio != null ? envio.getId() : "null")
-                + ", ruta=" + (ruta != null ? ruta.getId() : "null")
-                + ", vehiculo=" + (vehiculo != null ? vehiculo.getId() : "null")
+                + ", envio=" + (envio != null ? envio.toString() : "null")
+                + ", ruta=" + (ruta != null ? ruta.toString() : "null")
+                + ", vehiculo=" + (vehiculo != null ? vehiculo.toString() : "null")
                 + ", fechaAsignacion=" + fechaAsignacion
                 + '}';
     }
+
 }
