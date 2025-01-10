@@ -33,22 +33,20 @@ import javax.xml.bind.annotation.XmlTransient;
  *
  * @author Omar
  */
-
-
 @NamedQueries({
     @NamedQuery(
-            name = "findAllUsers",
-            query = "Select u From User u")
+                    name = "findAllUsers",
+                    query = "Select u From User u")
     ,
    @NamedQuery(
-            name = "signin",
-            query = "SELECT u FROM User u WHERE u.email = :userEmail AND u.password = :userPassword"
+                    name = "signin",
+                    query = "SELECT u FROM User u WHERE u.email = :userEmail AND u.password = :userPassword"
     )
     ,
    @NamedQuery(
-            name = "findUserByEmail",
-            query = "SELECT u FROM User u WHERE u.email=:userEmail")
-   
+                    name = "findUserByEmail",
+                    query = "SELECT u FROM User u WHERE u.email=:userEmail")
+
 })
 
 @Entity
@@ -70,13 +68,38 @@ public class User implements Serializable {
     private String city;
     private String street;
     private Integer zip;
+    private String verifcationCode;
     private boolean activo;
+
+    public User() {
+    }
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
+    public User(Long id, String email, String name, String password, String country, String city, String street, Integer zip, String verifcationCode, boolean activo, List<Envio> enviosList) {
+        this.id = id;
+        // anotation to be unnique
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.country = country;
+        this.city = city;
+        this.street = street;
+        this.zip = zip;
+        this.verifcationCode = verifcationCode;
+        this.activo = activo;
+        this.enviosList = enviosList;
+    }
+
     
-//   @Enumerated(EnumType.STRING)
-//    private UserType userType;
+    
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-                    schema = "FleetIQ",  name = "user_envio",
+                    schema = "FleetIQ", name = "user_envio",
                     joinColumns = @JoinColumn(name = "user_id"),
                     inverseJoinColumns = @JoinColumn(name = "envio_id")
     )
@@ -162,6 +185,14 @@ public class User implements Serializable {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public String getVerifcationCode() {
+        return verifcationCode;
+    }
+
+    public void setVerifcationCode(String verifcationCode) {
+        this.verifcationCode = verifcationCode;
     }
 
     //

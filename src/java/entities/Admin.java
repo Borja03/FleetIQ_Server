@@ -19,9 +19,10 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Omar
  */
 @Entity
-@DiscriminatorValue("Admin")
+@DiscriminatorValue("admin")
 @XmlRootElement
-public class AdminEntity extends User  implements Serializable {
+
+public class Admin extends User  implements Serializable {
 
     private Date ultimoInicioSesion;
 
@@ -43,10 +44,10 @@ public class AdminEntity extends User  implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof AdminEntity)) {
+        if (!(object instanceof Admin)) {
             return false;
         }
-        AdminEntity other = (AdminEntity) object;
+        Admin other = (Admin) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }

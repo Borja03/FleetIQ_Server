@@ -11,24 +11,26 @@ import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-    @NamedQueries({
+@NamedQueries({
+    @NamedQuery(
+                    name = "Envio.findAll",
+                    query = "SELECT e FROM Envio e"
+    )
+    ,
         @NamedQuery(
-            name = "Envio.findAll",
-            query = "SELECT e FROM Envio e"
-        ),
+                    name = "Envio.filterByDates",
+                    query = "SELECT e FROM Envio e WHERE e.fechaEnvio BETWEEN :firstDate AND :secondDate"
+    )
+    ,
         @NamedQuery(
-            name = "Ruta.filterByDates",
-            query = "SELECT e FROM Envio e WHERE e.fechaEnvio BETWEEN :firstDate AND :secondDate"
-        ),
+                    name = "Envio.filterEstado",
+                    query = "SELECT e FROM Envio e WHERE e.estado = :estado"
+    )
+    ,
         @NamedQuery(
-            name = "Ruta.filterEstado",
-            query = "SELECT e FROM Envio e WHERE e.estado = :estado"
-        ),
-        @NamedQuery(
-            name = "Ruta.filterNumPaquetes",
-            query = "SELECT e FROM Envio e WHERE e.numPaquetes = :numPaquetes"
-        ),
-    })
+                    name = "Envio.filterNumPaquetes",
+                    query = "SELECT e FROM Envio e WHERE e.numPaquetes = :numPaquetes"
+    ),})
 
 /**
  * Entidad JPA que representa un Envío.
@@ -39,7 +41,7 @@ import javax.xml.bind.annotation.XmlTransient;
 public class Envio implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
     @Temporal(TemporalType.DATE)
@@ -66,16 +68,15 @@ public class Envio implements Serializable {
     @Column(name = "vehiculo", length = 10)
     private String vehiculo;
 
-     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "envio_ruta_vehiculo_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "envio_ruta_vehiculo_id")
     private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(mappedBy = "enviosList")
     private List<User> userList;
 
-    @OneToMany(cascade=ALL,mappedBy="envio",fetch=EAGER)
+    @OneToMany(cascade = ALL, mappedBy = "envio", fetch = EAGER)
     private List<Paquete> packageList;
-    
 
     @XmlTransient
     public List<Paquete> getPackageList() {
@@ -84,6 +85,15 @@ public class Envio implements Serializable {
 
     public void setPackageList(List<Paquete> packageList) {
         this.packageList = packageList;
+    }
+
+    @XmlTransient 
+    public EnvioRutaVehiculo getEnvioRutaVehiculo() {
+        return envioRutaVehiculo;
+    }
+
+    public void setEnvioRutaVehiculo(EnvioRutaVehiculo envioRutaVehiculo) {
+        this.envioRutaVehiculo = envioRutaVehiculo;
     }
 
     @XmlTransient

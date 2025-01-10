@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Omar
  */
 @Entity
-@DiscriminatorValue("Trabajador")
+@DiscriminatorValue("trabajador")
 @XmlRootElement
 public class Trabajador extends User implements Serializable {
 
@@ -33,7 +33,7 @@ public class Trabajador extends User implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-       // hash += (id != null ? id.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -52,8 +52,8 @@ public class Trabajador extends User implements Serializable {
 
     @Override
     public String toString() {
-      //  return "entitie.Trabajador[ id=" + id + " ]";
-      return null;
+        //  return "entitie.Trabajador[ id=" + id + " ]";
+        return null;
     }
 
 }

@@ -1,41 +1,24 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package service;
 
 import entities.User;
-import exception.CreateException;
-import exception.DeleteException;
-import exception.EmailAlreadyExistsException;
-import exception.SelectException;
-import exception.UpdateException;
+import exception.*;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-
 import javax.persistence.PersistenceContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import utils.EmailSender;
+import utils.Utils;
 
-/**
- *
- * @author Omar
- */
 @Stateless
-@Path("entities.userentity")
+@Path("user")
 public class UserREST extends AbstractFacade<User> {
+
+    private static final Logger LOGGER = Logger.getLogger(UserREST.class.getName());
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
     private EntityManager em;
@@ -44,69 +27,139 @@ public class UserREST extends AbstractFacade<User> {
         super(User.class);
     }
 
+    @GET
+    @Produces({MediaType.APPLICATION_XML})
+    public List<User> findAllUsers() throws SelectException {
+        try {
+            return super.findAll();
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error retrieving users", ex);
+            throw new SelectException("Failed to retrieve users");
+        }
+    }
+
     @POST
     @Consumes({MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_XML})
     public User createUser(User user) throws CreateException {
-        try {
-            User existeUser = em.createNamedQuery("findUserByEmail", User.class)
-                            .setParameter("email", user.getEmail())
-                            .getSingleResult();
-            throw new EmailAlreadyExistsException("User with this email already exists");
+        try {        
+            // Check for existing email
+            if (findUserByEmail(user.getEmail()) != null) {
+                throw new CreateException("Email already exists");
+            }
 
-        } catch (NoResultException e) {
+            // Hash password before storing
+            //user.setPassword(hashPassword(user.getPassword()));
             super.create(user);
             return user;
-        } catch (EmailAlreadyExistsException ex) {
-            Logger.getLogger(UserREST.class.getName()).log(Level.SEVERE, null, ex);
+
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error creating user", ex);
+            throw new CreateException(ex.getMessage());
         }
-        return null;
     }
+
+//    @POST
+//    @Consumes({MediaType.APPLICATION_XML})
+//    @Produces({MediaType.APPLICATION_XML})
+//    public User loginUser(User user) throws SelectException {
+//        try {
+//            User dbUser = findUserByEmail(user.getEmail());
+//            
+//            if (dbUser == null) {
+//                throw new SelectException("Invalid credentials");
+//            }
+//
+//            // Verify password
+//            if (user.getPassword().equals(dbUser.getPassword())) {
+//                throw new SelectException("Invalid credentials");
+//            }
+//            // do not send password 
+//            dbUser.setPassword(null);
+//            return dbUser;
+//
+//        } catch (Exception ex) {
+//            LOGGER.log(Level.SEVERE, "Error during login", ex);
+//            throw new SelectException("Login failed");
+//        }
+//    }
 
     @PUT
-    @Path("{id}")
+    @Path("/reset-password")
     @Consumes({MediaType.APPLICATION_XML})
-    public void edit(@PathParam("id") Long id, User entity) throws UpdateException {
-        super.edit(entity);
+    public void requestPasswordReset(String email) throws SelectException {
+        try {
+            User user = findUserByEmail(email);
+            if (user != null) {
+                String verificationCode = Utils.generateRandomCode();
+                user.setVerifcationCode(verificationCode);
+                super.edit(user);
+                EmailSender.sendEmail(email, verificationCode);
+            }
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Failed to process password reset", ex);
+            throw new SelectException("Password reset failed");
+        }
     }
 
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") Long id) throws SelectException, DeleteException {
-        super.remove(super.find(id));
+//    @PUT
+//    @Path("/verify-reset")
+//    @Consumes(MediaType.APPLICATION_XML)
+//    public void verifyAndUpdatePassword(User user) throws UpdateException {
+//        try {
+//            User user = findUserByEmail(user.getEmail());
+//            if (user == null) {
+//                throw new UpdateException("Invalid request");
+//            }
+//
+//            if (!SecurityUtils.verifyCode(user.getCode(), user.getVerifcationCode()) || 
+//                SecurityUtils.isCodeExpired(user.getVerificationExpiry())) {
+//                throw new UpdateException("Invalid or expired verification code");
+//            }
+//
+//            if (!isValidPassword(user.getNewPassword())) {
+//                throw new UpdateException("Invalid password format");
+//            }
+//
+//            user.setPassword(SecurityUtils.hashPassword(user.getNewPassword()));
+//            user.setVerifcationCode(null);
+//            super.edit(user);
+//
+//        } catch (Exception ex) {
+//            LOGGER.log(Level.SEVERE, "Error updating password", ex);
+//            throw new UpdateException("Password update failed");
+//        }
+//    }
+
+    @PUT
+    @Path("/update/{id}")
+    @Consumes({MediaType.APPLICATION_XML})
+    public void updateUser(@PathParam("id") Long id, User user) throws UpdateException {
+        try {
+            User existUser = super.find(id);
+            if (existUser == null) {
+                throw new UpdateException("User not found");
+            }
+            existUser.setPassword(user.getPassword());
+            super.edit(existUser);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error updating user", ex);
+            throw new UpdateException("Update failed");
+        }
     }
 
-    @GET
-    @Path("{id}")
-    @Produces({MediaType.APPLICATION_XML})
-    public User find(@PathParam("id") Long id) throws SelectException {
-        return super.find(id);
+    private User findUserByEmail(String email) {
+        try {
+            return em.createNamedQuery("findUserByEmail", User.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null;
+        }
     }
-
-    @GET
-    @Override
-    @Produces({MediaType.APPLICATION_XML})
-    public List<User> findAll() throws SelectException {
-        return super.findAll();
-    }
-
-    @GET
-    @Path("{from}/{to}")
-    @Produces({MediaType.APPLICATION_XML})
-    public List<User> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) throws SelectException {
-        return super.findRange(new int[]{from, to});
-    }
-
-    //@GET
-    //@Path("count")
-    //@Produces(MediaType.TEXT_PLAIN)
-    //public String countREST() {
-    //    return String.valueOf(super.count());
-    //}
 
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
-
 }
