@@ -6,6 +6,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -13,22 +14,24 @@ import javax.xml.bind.annotation.XmlTransient;
 
 @NamedQueries({
     @NamedQuery(
-        name = "Envio.findAll",
-        query = "SELECT e FROM Envio e"
-    ),
+            name = "Envio.findAll",
+            query = "SELECT e FROM Envio e"
+    )
+    ,
     @NamedQuery(
-        name = "Ruta.filterByDates",
-        query = "SELECT e FROM Envio e WHERE e.fechaEnvio BETWEEN :firstDate AND :secondDate"
-    ),
+            name = "Ruta.filterByDates",
+            query = "SELECT e FROM Envio e WHERE e.fechaEnvio BETWEEN :firstDate AND :secondDate"
+    )
+    ,
     @NamedQuery(
-        name = "Ruta.filterEstado",
-        query = "SELECT e FROM Envio e WHERE e.estado = :estado"
-    ),
+            name = "Ruta.filterEstado",
+            query = "SELECT e FROM Envio e WHERE e.estado = :estado"
+    )
+    ,
     @NamedQuery(
-        name = "Ruta.filterNumPaquetes",
-        query = "SELECT e FROM Envio e WHERE e.numPaquetes = :numPaquetes"
-    ),
-})
+                name = "Ruta.filterNumPaquetes",
+                query = "SELECT e FROM Envio e WHERE e.numPaquetes < :numPaquetes"
+        ),})
 
 /**
  * Entidad JPA que representa un Envío.
@@ -77,7 +80,6 @@ public class Envio implements Serializable {
     private List<Paquete> packageList;
 
     // Métodos de acceso (getters y setters) de los campos transitorios
-
     @XmlTransient
     public List<Paquete> getPackageList() {
         return packageList;
@@ -105,7 +107,6 @@ public class Envio implements Serializable {
     }
 
     // Getters y Setters de otros campos
-
     public Integer getId() {
         return id;
     }
@@ -168,6 +169,25 @@ public class Envio implements Serializable {
 
     public void setVehiculo(String vehiculo) {
         this.vehiculo = vehiculo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;  // Si ambos objetos son la misma referencia
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;  // Si no son del mismo tipo
+        }
+        Envio envio = (Envio) o;  // Convertir el objeto al tipo correcto
+
+        return Objects.equals(id, envio.id);  // Comparar el id de los envíos (suponiendo que id es único)
+    }
+
+    // Implementación del método hashCode
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);  // El hashcode se basa en el id único
     }
 
     @Override

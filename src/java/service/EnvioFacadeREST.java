@@ -1,6 +1,7 @@
 package service;
 
 import entities.Envio;
+import entities.Estado;
 import exception.CreateException;
 import exception.DeleteException;
 import exception.SelectException;
@@ -15,6 +16,7 @@ import javax.persistence.Query;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -101,16 +103,17 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
             query.setParameter("secondDate", second);
             return query.getResultList();
 
-        } catch (ParseException e) {
-            throw new SelectException("Fecha inválida, por favor use el formato yyyy-MM-dd");
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Fecha inválida, por favor use el formato yyyy-MM-dd");
         }
     }
 
     @GET
     @Path("filterEstado")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Envio> filterEstado(@QueryParam("estado") String estado) throws SelectException {
+    public List<Envio> filterEstado(@QueryParam("estado") String estadoS) throws SelectException {
         Query query = em.createNamedQuery("Ruta.filterEstado");
+        Estado estado = Estado.valueOf(estadoS.toUpperCase());
         query.setParameter("estado", estado);
         return query.getResultList();
     }
@@ -119,9 +122,17 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
     @Path("filterNumPaquetes")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Envio> filterNumPaquetes(@QueryParam("numPaquetes") Integer numPaquetes) throws SelectException {
-        Query query = em.createNamedQuery("Ruta.filterNumPaquetes");
-        query.setParameter("numPaquetes", numPaquetes);
-        return query.getResultList();
+        if (numPaquetes == null) {
+            throw new IllegalArgumentException("El número de paquetes no puede ser null.");
+        }
+
+        try {
+            Query query = em.createNamedQuery("Ruta.filterNumPaquetes");
+            query.setParameter("numPaquetes", numPaquetes);
+            return query.getResultList();
+        } catch (Exception e) {
+            throw new SelectException("Error al filtrar por número de paquetes: " + e.getMessage(), e);
+        }
     }
 
     @Override
