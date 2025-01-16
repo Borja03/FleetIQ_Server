@@ -139,4 +139,5 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
     protected EntityManager getEntityManager() {
         return em;
     }
+
 }

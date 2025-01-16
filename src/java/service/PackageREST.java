@@ -93,10 +93,6 @@ public class PackageREST extends AbstractFacade<Paquete> {
     @Produces({MediaType.APPLICATION_XML})
     public List<Paquete> findAllPackages() throws SelectException {
         try {
-//            List<Paquete> packagesToSend =super.findAll();
-//            for(Paquete p :packagesToSend ){
-//                System.out.println(p.toString());
-//            }
             return super.findAll();
         } catch (Exception ex) {
             throw new SelectException("Error retrieving packages: " + ex.getMessage());
@@ -116,32 +112,6 @@ public class PackageREST extends AbstractFacade<Paquete> {
         }
     }
 
-//    @GET
-//    @Path("date")
-//    @Produces({MediaType.APPLICATION_XML})
-//    public List<Package> findPackagesByDates(@QueryParam("startDate") Date startDate, @QueryParam("endDate") Date endDate
-//    ) throws SelectException {
-//        try {
-//            if (startDate != null && endDate != null) {
-//                return em.createNamedQuery("findByDateRange", Paquete.class)
-//                                .setParameter("startDate", startDate)
-//                                .setParameter("endDate", endDate)
-//                                .getResultList();
-//            } else if (startDate != null) {
-//                return em.createNamedQuery("findAfterDate", Paquete.class)
-//                                .setParameter("startDate", startDate)
-//                                .getResultList();
-//            } else if (endDate != null) {
-//                return em.createNamedQuery("findBeforeDate", Paquete.class)
-//                                .setParameter("endDate", endDate)
-//                                .getResultList();
-//            } else {
-//                throw new SelectException("At least one date must be provided.");
-//            }
-//        } catch (Exception ex) {
-//            throw new SelectException("Error retrieving packages by dates: " + ex.getMessage());
-//        }
-//    }
     @GET
     @Path("date")
     @Produces({MediaType.APPLICATION_XML})
