@@ -48,6 +48,12 @@ import javax.xml.bind.annotation.XmlTransient;
             name = "Ruta.filterDistanciaIgual",
             query = "SELECT r FROM Ruta r WHERE r.distancia = :distancia"
     )
+    ,
+     @NamedQuery(
+            name = "Ruta.findByLocalizadorInteger",
+            query = "SELECT r FROM Ruta r WHERE r.localizador = :localizador"
+    )
+
 })
 
 /**
