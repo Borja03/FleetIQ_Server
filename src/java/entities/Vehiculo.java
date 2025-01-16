@@ -69,14 +69,16 @@ public class Vehiculo implements Serializable {
     @Column(name = "capacidad_carga", nullable = true)
     private Integer capacidadCarga;
     
+    @Temporal(TemporalType.DATE)
     @Column(name = "registrationDate", nullable = true)
     private Date registrationDate;
     
+    @Temporal(TemporalType.DATE)
     @Column(name = "itvDate", nullable = true)
     private Date itvDate;
 
     @Column(name = "activo", nullable = false)
-    private boolean activo; // Ejemplo: "Disponible", "En uso", "Mantenimiento"
+    private boolean activo;
 
     @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<EnvioRutaVehiculo> envioRutaVehiculoList;
