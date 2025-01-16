@@ -11,8 +11,6 @@ import exception.DeleteException;
 import exception.SelectException;
 import exception.UpdateException;
 import java.time.format.DateTimeFormatter;
-
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -20,9 +18,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.swing.text.DateFormatter;
 import javax.ws.rs.Consumes;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -37,9 +32,8 @@ import javax.ws.rs.core.MediaType;
  *
  * @author 2dam
  */
-
 @Stateless
-@Path("vehiculo")
+@Path("entities.vehiculo")
 public class VehiculoREST extends AbstractFacade<Vehiculo> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
@@ -146,117 +140,6 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
         }
 */
         return query.getResultList();
-
-    // Method to filter vehicles by ITVDATE
-    @GET
-    @Path("filterByITVDate")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Vehiculo> findVehiculosByItvDateRange(
-        @QueryParam("startDate") @DefaultValue("") String startDate,
-        @QueryParam("endDate") @DefaultValue("") String endDate) throws SelectException {
-        
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            
-            Date start = null;
-            Date end = null;
-
-            // Parse the start date if provided
-            if (!startDate.isEmpty()) {
-                start = dateFormat.parse(startDate);
-            }
-            
-            // Parse the end date if provided
-            if (!endDate.isEmpty()) {
-                end = dateFormat.parse(endDate);
-            }
-
-            // Check if both dates are provided
-            if (start != null && end != null) {
-                // Ensure the start date is before the end date
-                if (start.after(end)) {
-                    throw new SelectException("Start date must be before end date");
-                }
-                return em.createNamedQuery("findByDateRangeITV", Vehiculo.class)
-                        .setParameter("startDate", start)
-                        .setParameter("endDate", end)
-                        .getResultList();
-            } 
-            // If only the start date is provided
-            else if (start != null) {
-                return em.createNamedQuery("findAfterDateITV", Vehiculo.class)
-                        .setParameter("startDate", start)
-                        .getResultList();
-            } 
-            // If only the end date is provided
-            else if (end != null) {
-                return em.createNamedQuery("findBeforeDateITV", Vehiculo.class)
-                        .setParameter("endDate", end)
-                        .getResultList();
-            } 
-            // Throw an exception if no dates are provided
-            else {
-                throw new SelectException("At least one date parameter must be provided");
-            }
-        } catch (Exception e) {
-            throw new SelectException("Error retrieving vehicles by ITV date range: " + e.getMessage());
-        }
-    }
-
-    // Method to filter vehicles by registration date range
-    @GET
-    @Path("filterByITVRegistration")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Vehiculo> findVehiculosByRegistrationDateRange(
-        @QueryParam("startDate") @DefaultValue("") String startDate,
-        @QueryParam("endDate") @DefaultValue("") String endDate) throws SelectException {
-        
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            
-            Date start = null;
-            Date end = null;
-
-            // Parse the start date if provided
-            if (!startDate.isEmpty()) {
-                start = dateFormat.parse(startDate);
-            }
-            
-            // Parse the end date if provided
-            if (!endDate.isEmpty()) {
-                end = dateFormat.parse(endDate);
-            }
-
-            // Check if both dates are provided
-            if (start != null && end != null) {
-                // Ensure the start date is before the end date
-                if (start.after(end)) {
-                    throw new SelectException("Start date must be before end date");
-                }
-                return em.createNamedQuery("findByDateRangeRegistration", Vehiculo.class)
-                        .setParameter("startDate", start)
-                        .setParameter("endDate", end)
-                        .getResultList();
-            } 
-            // If only the start date is provided
-            else if (start != null) {
-                return em.createNamedQuery("findAfterDateRegistration", Vehiculo.class)
-                        .setParameter("startDate", start)
-                        .getResultList();
-            } 
-            // If only the end date is provided
-            else if (end != null) {
-                return em.createNamedQuery("findBeforeDateRegistration", Vehiculo.class)
-                        .setParameter("endDate", end)
-                        .getResultList();
-            } 
-            // Throw an exception if no dates are provided
-            else {
-                throw new SelectException("At least one date parameter must be provided");
-            }
-        } catch (Exception e) {
-            throw new SelectException("Error retrieving vehicles by registration date range: " + e.getMessage());
-        }
     }
 
     @Override

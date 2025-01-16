@@ -1,13 +1,16 @@
 package service;
 
 import entities.Envio;
+import entities.EnvioRutaVehiculo;
 import entities.Estado;
+import entities.Ruta;
 import exception.CreateException;
 import exception.DeleteException;
 import exception.SelectException;
 import exception.UpdateException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -24,6 +27,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -98,7 +102,7 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
             java.util.Date first = dateFormat.parse(firstDate);
             java.util.Date second = dateFormat.parse(secondDate);
 
-            Query query = em.createNamedQuery("Ruta.filterByDates");
+            Query query = em.createNamedQuery("Envio.filterByDates");
             query.setParameter("firstDate", first);
             query.setParameter("secondDate", second);
             return query.getResultList();
@@ -112,7 +116,7 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
     @Path("filterEstado")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Envio> filterEstado(@QueryParam("estado") String estadoS) throws SelectException {
-        Query query = em.createNamedQuery("Ruta.filterEstado");
+        Query query = em.createNamedQuery("Envio.filterEstado");
         Estado estado = Estado.valueOf(estadoS.toUpperCase());
         query.setParameter("estado", estado);
         return query.getResultList();
@@ -127,11 +131,68 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
         }
 
         try {
-            Query query = em.createNamedQuery("Ruta.filterNumPaquetes");
+            Query query = em.createNamedQuery("Envio.filterNumPaquetes");
             query.setParameter("numPaquetes", numPaquetes);
             return query.getResultList();
         } catch (Exception e) {
             throw new SelectException("Error al filtrar por número de paquetes: " + e.getMessage(), e);
+        }
+    }
+
+    @GET
+    @Path("getRutaYEnvioRutaVehiculoPorMatricula")
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public Response getRutaYEnvioRutaVehiculoPorMatricula(@QueryParam("matricula") String matricula) {
+        if (matricula == null || matricula.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("El parámetro matricula es obligatorio.")
+                    .build();
+        }
+
+        try {
+            // Buscar el ID del vehículo a partir de la matrícula
+            Query vehiculoQuery = em.createQuery("SELECT v.id FROM Vehiculo v WHERE v.matricula = :matricula");
+            vehiculoQuery.setParameter("matricula", matricula);
+
+            // Obtener el vehiculoId
+            Integer vehiculoId = (Integer) vehiculoQuery.getSingleResult();
+
+            if (vehiculoId == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("No se encontró ningún vehículo con matrícula: " + matricula)
+                        .build();
+            }
+
+            // Ejecutar la consulta para obtener la ruta y el ID de EnvioRutaVehiculo usando vehiculoId
+            Query query = em.createNamedQuery("Envio.getRutaYEnvioRutaVehiculoPorVehiculo");
+            query.setParameter("vehiculoId", vehiculoId);
+
+            // Obtener el primer (y único) resultado de la consulta
+            Object[] result = (Object[]) query.getSingleResult(); // Obtiene el único resultado
+
+            if (result == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                        .entity("No se encontró ninguna ruta o EnvioRutaVehiculo para el vehículo con ID: " + vehiculoId)
+                        .build();
+            }
+
+            // Crear los objetos Ruta y EnvioRutaVehiculo
+            Integer localizador = (Integer) result[0];
+            Integer envioRutaVehiculoId = (Integer) result[1];
+
+            Ruta ruta = new Ruta();
+            ruta.setLocalizador(localizador);
+
+            EnvioRutaVehiculo envioRutaVehiculo = new EnvioRutaVehiculo();
+            envioRutaVehiculo.setRuta(ruta);
+            envioRutaVehiculo.setId(envioRutaVehiculoId);
+
+            // Devolver el resultado en formato JSON
+            return Response.ok(envioRutaVehiculo).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Error al procesar la solicitud: " + e.getMessage())
+                    .build();
         }
     }
 

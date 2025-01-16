@@ -19,19 +19,25 @@ import javax.xml.bind.annotation.XmlTransient;
     )
     ,
     @NamedQuery(
-            name = "Ruta.filterByDates",
+            name = "Envio.filterByDates",
             query = "SELECT e FROM Envio e WHERE e.fechaEnvio BETWEEN :firstDate AND :secondDate"
     )
     ,
     @NamedQuery(
-            name = "Ruta.filterEstado",
+            name = "Envio.filterEstado",
             query = "SELECT e FROM Envio e WHERE e.estado = :estado"
     )
     ,
     @NamedQuery(
-                name = "Ruta.filterNumPaquetes",
-                query = "SELECT e FROM Envio e WHERE e.numPaquetes < :numPaquetes"
-        ),})
+            name = "Envio.filterNumPaquetes",
+            query = "SELECT e FROM Envio e WHERE e.numPaquetes < :numPaquetes"
+    )
+    ,
+    @NamedQuery(
+            name = "Envio.getRutaYEnvioRutaVehiculoPorVehiculo",
+            query = "SELECT erv.ruta.localizador, erv.id FROM EnvioRutaVehiculo erv WHERE erv.vehiculo.id = :vehiculoId"
+    ),
+})
 
 /**
  * Entidad JPA que representa un Envío.
