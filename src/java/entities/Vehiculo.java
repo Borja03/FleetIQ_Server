@@ -1,193 +1,152 @@
-package service;
+package entities;
 
-import entities.Vehiculo;
-import exception.CreateException;
-import exception.DeleteException;
-import exception.SelectException;
-import exception.UpdateException;
-import java.text.SimpleDateFormat;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import javax.persistence.*;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
-@Stateless
-@Path("vehiculo")
-public class VehiculoREST extends AbstractFacade<Vehiculo> {
+@NamedQueries({
+    
+    @NamedQuery(
+            name = "vfindAll",
+            query = "SELECT v FROM Vehiculo v"
+    ),
+    @NamedQuery(
+            name = "findByCapacity",
+            query = "SELECT v FROM Vehiculo v WHERE v.capacidadCarga = :capacidadCarga"
+    ),
+    @NamedQuery(
+            name = "findByDateRangeITV",
+            query = "SELECT v FROM Vehiculo v WHERE v.itvDate BETWEEN :startDate AND :endDate"
+    ),
+    @NamedQuery(
+            name = "findByDateRangeRegistration",
+            query = "SELECT v FROM Vehiculo v WHERE v.registrationDate BETWEEN :startDate AND :endDate"
+    ),
+    @NamedQuery(
+            name = "findByPlate",
+            query = "SELECT v FROM Vehiculo v WHERE LOWER(v.matricula) LIKE LOWER(:matricula)"
+    ),
+    @NamedQuery(
+            name = "findAfterDateITV",
+            query = "SELECT v FROM Vehiculo v WHERE v.itvDate >= :startDate"
+    ),
+    @NamedQuery(
+            name = "findAfterDateRegistration",
+            query = "SELECT v FROM Vehiculo v WHERE v.registrationDate >= :startDate"
+    ),
+    @NamedQuery(
+            name = "findBeforeDateITV",
+            query = "SELECT v FROM Vehiculo v WHERE v.itvDate <= :endDate"
+    ),
+    @NamedQuery(
+            name = "findBeforeDateRegistration",
+            query = "SELECT v FROM Vehiculo v WHERE v.registrationDate <= :endDate"
+    )
+})
 
-    @PersistenceContext(unitName = "FleetIQ_ServerPU")
-    private EntityManager em;
 
-    public VehiculoREST() {
-        super(Vehiculo.class);
+/**
+ * Entidad JPA que representa un Vehículo.
+ */
+@Entity
+@Table(name = "vehiculo", schema = "FleetIQ")
+@XmlRootElement
+public class Vehiculo implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
+    @Column(name = "matricula", nullable = false, unique = true, length = 15)
+    private String matricula;
+
+    @Column(name = "modelo", nullable = true, length = 50)
+    private String modelo;
+
+    @Column(name = "capacidad_carga", nullable = true)
+    private Integer capacidadCarga;
+    
+    @Column(name = "registrationDate", nullable = true)
+    private Date registrationDate;
+    
+    @Column(name = "itvDate", nullable = true)
+    private Date itvDate;
+
+    @Column(name = "activo", nullable = false)
+    private boolean activo; // Ejemplo: "Disponible", "En uso", "Mantenimiento"
+
+    @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<EnvioRutaVehiculo> envioRutaVehiculoList;
+
+    // Getters y Setters
+
+    public Integer getId() {
+        return id;
     }
 
-    @POST
-    @Override
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(Vehiculo entity) throws CreateException {
-        super.create(entity);
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    @PUT
-    @Path("{id}")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void edit(@PathParam("id") Integer id, Vehiculo entity) throws UpdateException {
-        super.edit(entity);
+    public String getMatricula() {
+        return matricula;
     }
 
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") Integer id) throws SelectException, DeleteException {
-        super.remove(super.find(id));
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
     }
 
-    @GET
-    @Path("{id}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public Vehiculo find(@PathParam("id") Integer id) throws SelectException {
-        return super.find(id);
+    public String getModelo() {
+        return modelo;
     }
 
-    @GET
-    @Override
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Vehiculo> findAll() throws SelectException {
-        return super.findAll();
+    public void setModelo(String modelo) {
+        this.modelo = modelo;
     }
 
-    @GET
-    @Path("{from}/{to}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Vehiculo> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) throws SelectException {
-        return super.findRange(new int[]{from, to});
+    public Integer getCapacidadCarga() {
+        return capacidadCarga;
     }
 
-    @GET
-    @Path("count")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String countREST() {
-        return String.valueOf(super.count());
+    public void setCapacidadCarga(Integer capacidadCarga) {
+        this.capacidadCarga = capacidadCarga;
     }
 
-    @GET
-    @Path("capacity/{capacity}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Vehiculo> findByCapacity(@PathParam("capacity") Integer capacity) {
-        return em.createNamedQuery("findByCapacity", Vehiculo.class)
-                .setParameter("capacidadCarga", capacity)
-                .getResultList();
+    public Date getRegistrationDate() {
+        return registrationDate;
     }
 
-    @GET
-    @Path("plate/{matricula}")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Vehiculo> findByPlate(@PathParam("matricula") String matricula) {
-        return em.createNamedQuery("findByPlate", Vehiculo.class)
-                .setParameter("matricula", "%" + matricula + "%")
-                .getResultList();
+    public void setRegistrationDate(Date registrationDate) {
+        this.registrationDate = registrationDate;
     }
 
-    // Method to filter vehicles by ITVDATE
-    @GET
-    @Path("filterByITVDate")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Vehiculo> findVehiculosByItvDateRange(@QueryParam("firstDate") String firstDate, @QueryParam("secondDate") String secondDate) throws SelectException {
-
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-            Date start = null;
-            Date end = null;
-            java.util.Date first = dateFormat.parse(firstDate);
-            java.util.Date second = dateFormat.parse(secondDate);
-            // Check if both dates are provided
-            if (start != null && end != null) {
-                // Ensure the start date is before the end date
-                if (start.after(end)) {
-                    throw new SelectException("Start date must be before end date");
-                }
-                return em.createNamedQuery("findByDateRangeITV", Vehiculo.class)
-                        .setParameter("startDate", first)
-                        .setParameter("endDate", second)
-                        .getResultList();
-            } // If only the start date is provided
-            else if (start != null) {
-                return em.createNamedQuery("findAfterDateITV", Vehiculo.class)
-                        .setParameter("startDate", start)
-                        .getResultList();
-            } // If only the end date is provided
-            else if (second != null) {
-                return em.createNamedQuery("findBeforeDateITV", Vehiculo.class)
-                        .setParameter("endDate", second)
-                        .getResultList();
-            } // Throw an exception if no dates are provided
-            else {
-                throw new SelectException("At least one date parameter must be provided");
-            }
-        } catch (Exception e) {
-            throw new SelectException("Error retrieving vehicles by ITV date range: " + e.getMessage());
-        }
+    public Date getItvDate() {
+        return itvDate;
     }
 
-    // Method to filter vehicles by registration date range
-    @GET
-    @Path("filterByITVRegistration")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Vehiculo> findVehiculosByRegistrationDateRange(@QueryParam("firstDate") String firstDate, @QueryParam("secondDate") String secondDate) throws SelectException {
-
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-            Date start = null;
-            Date end = null;
-
-            java.util.Date first = dateFormat.parse(firstDate);
-            java.util.Date second = dateFormat.parse(secondDate);
-
-            // Check if both dates are provided
-            if (first != null && second != null) {
-                // Ensure the start date is before the end date
-                if (start.after(end)) {
-                    throw new SelectException("Start date must be before end date");
-                }
-                return em.createNamedQuery("findByDateRangeRegistration", Vehiculo.class)
-                        .setParameter("startDate", first)
-                        .setParameter("endDate", second)
-                        .getResultList();
-            } // If only the start date is provided
-            else if (first != null) {
-                return em.createNamedQuery("findAfterDateRegistration", Vehiculo.class)
-                        .setParameter("startDate", first)
-                        .getResultList();
-            } // If only the end date is provided
-            else if (second != null) {
-                return em.createNamedQuery("findBeforeDateRegistration", Vehiculo.class)
-                        .setParameter("endDate", second)
-                        .getResultList();
-            } // Throw an exception if no dates are provided
-            else {
-                throw new SelectException("At least one date parameter must be provided");
-            }
-        } catch (Exception e) {
-            throw new SelectException("Error retrieving vehicles by registration date range: " + e.getMessage());
-        }
+    public void setItvDate(Date itvDate) {
+        this.itvDate = itvDate;
     }
 
-    @Override
-    protected EntityManager getEntityManager() {
-        return em;
+    public boolean isActivo() {
+        return activo;
     }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+   
+
+    @XmlTransient
+    public List<EnvioRutaVehiculo> getEnvioRutaVehiculoList() {
+        return envioRutaVehiculoList;
+    }
+
+    public void setEnvioRutaVehiculoList(List<EnvioRutaVehiculo> envioRutaVehiculoList) {
+        this.envioRutaVehiculoList = envioRutaVehiculoList;
+    }
+
 }
