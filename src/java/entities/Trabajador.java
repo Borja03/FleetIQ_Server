@@ -6,8 +6,11 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -16,11 +19,20 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Omar
  */
 @Entity
-@DiscriminatorValue("Trabajador")
+@DiscriminatorValue("trabajador")
 @XmlRootElement
 public class Trabajador extends User implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String departamento;
+
+    public Trabajador() {
+    }
+
+    public Trabajador(String departamento, String email, String name, String password, String country, String city, String street, Integer zip, String verifcationCode, boolean activo) {
+        super(email, name, password, country, city, street, zip, verifcationCode, activo);
+        this.departamento = departamento;
+    }
 
     public String getDepartamento() {
         return departamento;
@@ -33,7 +45,7 @@ public class Trabajador extends User implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-       // hash += (id != null ? id.hashCode() : 0);
+        hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
@@ -44,16 +56,16 @@ public class Trabajador extends User implements Serializable {
             return false;
         }
         Trabajador other = (Trabajador) object;
-//        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-//            return false;
-//        }
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
         return true;
     }
 
     @Override
     public String toString() {
-      //  return "entitie.Trabajador[ id=" + id + " ]";
-      return null;
+        //  return "entitie.Trabajador[ id=" + id + " ]";
+        return null;
     }
 
 }
