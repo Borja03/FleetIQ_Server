@@ -48,55 +48,61 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
     @Override
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void create(Envio entity) throws CreateException {
-        super.create(entity);
+        try {
+            super.create(entity);
+        } catch (Exception e) {
+            throw new CreateException("Error al crear el envío: " + e.getMessage());
+        }
     }
 
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void edit(@PathParam("id") Integer id, Envio entity) throws UpdateException {
-        super.edit(entity);
-    }
-
-    @DELETE
-    @Path("{id}")
-    public void remove(@PathParam("id") Integer id) throws SelectException, DeleteException {
-        super.remove(super.find(id));
+        try {
+            super.edit(entity);
+        } catch (Exception e) {
+            throw new UpdateException("Error al actualizar el envío con id " + id + ": " + e.getMessage());
+        }
     }
 
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Envio find(@PathParam("id") Integer id) throws SelectException {
-        return super.find(id);
+        try {
+            return super.find(id);
+        } catch (Exception e) {
+            throw new SelectException("Error al obtener el envío con id " + id + ": " + e.getMessage(), e);
+        }
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Envio> findAll() throws SelectException {
-        return super.findAll();
+        try {
+            return super.findAll();
+        } catch (Exception e) {
+            throw new SelectException("Error al obtener todos los envíos: " + e.getMessage(), e);
+        }
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Envio> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) throws SelectException {
-        return super.findRange(new int[]{from, to});
-    }
-
-    @GET
-    @Path("count")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String countREST() {
-        return String.valueOf(super.count());
+        try {
+            return super.findRange(new int[]{from, to});
+        } catch (Exception e) {
+            throw new SelectException("Error al obtener el rango de envíos: " + e.getMessage(), e);
+        }
     }
 
     @GET
     @Path("filterByDates")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Envio> filterByDates(@QueryParam("firstDate") String firstDate, @QueryParam("secondDate") String secondDate) throws SelectException {
-        // Conversión de String a Date
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         try {
             java.util.Date first = dateFormat.parse(firstDate);
@@ -106,9 +112,10 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
             query.setParameter("firstDate", first);
             query.setParameter("secondDate", second);
             return query.getResultList();
-
+        } catch (ParseException e) {
+            throw new SelectException("Error al parsear las fechas. Formato esperado: yyyy-MM-dd", e);
         } catch (Exception e) {
-            throw new InternalServerErrorException("Fecha inválida, por favor use el formato yyyy-MM-dd");
+            throw new SelectException("Error al filtrar envíos por fechas: " + e.getMessage(), e);
         }
     }
 
@@ -116,10 +123,16 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
     @Path("filterEstado")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Envio> filterEstado(@QueryParam("estado") String estadoS) throws SelectException {
-        Query query = em.createNamedQuery("Envio.filterEstado");
-        Estado estado = Estado.valueOf(estadoS.toUpperCase());
-        query.setParameter("estado", estado);
-        return query.getResultList();
+        try {
+            Query query = em.createNamedQuery("Envio.filterEstado");
+            Estado estado = Estado.valueOf(estadoS.toUpperCase());
+            query.setParameter("estado", estado);
+            return query.getResultList();
+        } catch (IllegalArgumentException e) {
+            throw new SelectException("Estado inválido: " + estadoS, e);
+        } catch (Exception e) {
+            throw new SelectException("Error al filtrar envíos por estado: " + e.getMessage(), e);
+        }
     }
 
     @GET
@@ -127,7 +140,7 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Envio> filterNumPaquetes(@QueryParam("numPaquetes") Integer numPaquetes) throws SelectException {
         if (numPaquetes == null) {
-            throw new IllegalArgumentException("El número de paquetes no puede ser null.");
+            throw new SelectException("El número de paquetes no puede ser null.");
         }
 
         try {
@@ -145,54 +158,51 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
     public Response getRutaYEnvioRutaVehiculoPorMatricula(@QueryParam("matricula") String matricula) {
         if (matricula == null || matricula.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity("El parámetro matricula es obligatorio.")
+                    .entity("El parámetro matrícula es obligatorio.")
                     .build();
         }
 
         try {
-            // Buscar el ID del vehículo a partir de la matrícula
             Query vehiculoQuery = em.createQuery("SELECT v.id FROM Vehiculo v WHERE v.matricula = :matricula");
             vehiculoQuery.setParameter("matricula", matricula);
-
-            // Obtener el vehiculoId
             Integer vehiculoId = (Integer) vehiculoQuery.getSingleResult();
 
-            if (vehiculoId == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("No se encontró ningún vehículo con matrícula: " + matricula)
-                        .build();
-            }
-
-            // Ejecutar la consulta para obtener la ruta y el ID de EnvioRutaVehiculo usando vehiculoId
             Query query = em.createNamedQuery("Envio.getRutaYEnvioRutaVehiculoPorVehiculo");
             query.setParameter("vehiculoId", vehiculoId);
-
-            // Obtener el primer (y único) resultado de la consulta
-            Object[] result = (Object[]) query.getSingleResult(); // Obtiene el único resultado
-
-            if (result == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("No se encontró ninguna ruta o EnvioRutaVehiculo para el vehículo con ID: " + vehiculoId)
-                        .build();
-            }
-
-            // Crear los objetos Ruta y EnvioRutaVehiculo
-            Integer localizador = (Integer) result[0];
-            Integer envioRutaVehiculoId = (Integer) result[1];
+            Object[] result = (Object[]) query.getSingleResult();
 
             Ruta ruta = new Ruta();
-            ruta.setLocalizador(localizador);
+            ruta.setLocalizador((Integer) result[0]);
 
             EnvioRutaVehiculo envioRutaVehiculo = new EnvioRutaVehiculo();
             envioRutaVehiculo.setRuta(ruta);
-            envioRutaVehiculo.setId(envioRutaVehiculoId);
+            envioRutaVehiculo.setId((Integer) result[1]);
 
-            // Devolver el resultado en formato JSON
             return Response.ok(envioRutaVehiculo).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Error al procesar la solicitud: " + e.getMessage())
                     .build();
+        }
+    }
+
+    @DELETE
+    @Path("{id}")
+    public void deleteEnvio(@PathParam("id") Integer id) throws DeleteException {
+        try {
+            // Buscar el Envio por id
+            Envio envioToDelete = super.find(id);
+
+            if (envioToDelete == null) {
+                // Si no se encuentra el Envio, lanzar una excepción
+                throw new DeleteException("Envio not found with id: " + id);
+            }
+
+            // Eliminar el Envio encontrado
+            super.remove(envioToDelete);
+        } catch (Exception ex) {
+            // En caso de cualquier error, lanzar la excepción DeleteException con el mensaje correspondiente
+            throw new DeleteException("Error deleting Envio: " + ex.getMessage());
         }
     }
 
