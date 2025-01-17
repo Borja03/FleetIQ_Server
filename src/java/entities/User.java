@@ -12,6 +12,8 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,8 +25,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
@@ -49,14 +49,15 @@ import javax.xml.bind.annotation.XmlTransient;
 
 })
 
-
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
 @Table(schema = "FleetIQ", name = "user")
-@XmlRootElement
 @XmlSeeAlso({Admin.class, Trabajador.class}) 
+@XmlRootElement
+
 public class User implements Serializable {
+
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -65,33 +66,32 @@ public class User implements Serializable {
     private String email;
     private String name;
     private String password;
-    private String country;
     private String city;
     private String street;
     private Integer zip;
     private String verifcationCode;
     private boolean activo;
-    
-    
+
+    @Column(insertable = false, updatable = false)
+    //@Enumerated(EnumType.STRING)
+    private String user_type;
+
     public User() {
     }
 
-
-    public User(String email, String name, String password, String country, String city, String street, Integer zip, String verifcationCode, boolean activo) {
+    
+    
+    public User(String email, String name, String password, String city, String street, Integer zip, String verifcationCode, boolean activo) {
         // anotation to be unnique
         this.email = email;
         this.name = name;
         this.password = password;
-        this.country = country;
         this.city = city;
         this.street = street;
         this.zip = zip;
         this.verifcationCode = verifcationCode;
         this.activo = activo;
     }
-
-    
-    
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -133,14 +133,6 @@ public class User implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
     }
 
     public String getCity() {
@@ -191,6 +183,14 @@ public class User implements Serializable {
         this.verifcationCode = verifcationCode;
     }
 
+    public String getUser_type() {
+        return user_type;
+    }
+
+    public void setUser_type(String user_type) {
+        this.user_type = user_type;
+    }
+
     //
     @Override
     public int hashCode() {
@@ -201,8 +201,7 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "User{" + "id=" + id + ", email=" + email + ", name=" + name + ", password=" + password + ", country=" + country + ", city=" + city + ", street=" + street + ", zip=" + zip + ", verifcationCode=" + verifcationCode + ", activo=" + activo + ", enviosList=" + enviosList + '}';
+        return "User{" + "id=" + id + ", email=" + email + ", name=" + name + ", password=" + password + ", city=" + city + ", street=" + street + ", zip=" + zip + ", verifcationCode=" + verifcationCode + ", activo=" + activo + ", enviosList=" + enviosList + '}';
     }
-
 
 }

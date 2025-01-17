@@ -2,6 +2,8 @@ package service;
 
 import encryption.HashMD5;
 import encryption.SymmetricDecrypt;
+import entities.Admin;
+import entities.Trabajador;
 import entities.User;
 import exception.*;
 import java.util.List;
@@ -28,7 +30,6 @@ public class UserREST extends AbstractFacade<User> {
     private static final Logger LOGGER = Logger.getLogger(UserREST.class.getName());
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
     private EntityManager em;
-    User userTemp = null;
     SymmetricDecrypt symetrica = new SymmetricDecrypt();
 
     public UserREST() {
@@ -45,21 +46,45 @@ public class UserREST extends AbstractFacade<User> {
     @POST
     @Path("signup")
     @Consumes({MediaType.APPLICATION_XML})
-    public User signUp(User entity) throws CreateException {
-        try {
-            //decrypt asymetric 
-            //hash
-            entity.setPassword(HashMD5.hashText(entity.getPassword()));
-            super.create(entity);
-           
-            
-            em.detach(entity);
-            entity.setPassword(null);
-            return entity;
-        } catch (Exception e) {
-            //
-            return null;
+    public User signUp(User entity) {
+        LOGGER.info("before entering signup");
+        User newUser = null;
+        entity.setPassword(HashMD5.hashText(entity.getPassword()));
+        LOGGER.info("after hashing");
+   
+        if ("admin".equals(entity.getUser_type())) {
+            LOGGER.info("befor admin");
+            newUser = new Admin(); // Create a new Admin object
+            if (entity instanceof Admin) {
+                ((Admin) newUser).setUltimoInicioSesion(((Admin) entity).getUltimoInicioSesion());
+            }
+            LOGGER.info("as admin");
+        } else if ("trabajador".equals(entity.getUser_type())) {
+            LOGGER.info("befor Trabajador");
+            newUser = new Trabajador(); // Create a new Admin object
+            if (entity instanceof Admin) {
+                ((Trabajador) newUser).setDepartamento(((Trabajador) entity).getDepartamento());
+            }
+            LOGGER.info("as Trabajador");
         }
+        newUser.setId(entity.getId());
+        newUser.setName(entity.getName());
+        newUser.setActivo(entity.isActivo());
+        newUser.setCity(entity.getCity());
+        newUser.setEmail(entity.getEmail());
+        newUser.setPassword(entity.getPassword());
+        newUser.setStreet(entity.getStreet());
+        newUser.setZip(entity.getZip());
+        newUser.setVerifcationCode(entity.getVerifcationCode());
+        newUser.setEnviosList(entity.getEnviosList());
+        newUser.setUser_type(entity.getUser_type());
+        try {
+            super.create(newUser);
+
+        } catch (Exception e) {
+            e.printStackTrace(); // This will help you see the actual error
+        }
+        return newUser;
     }
 
     @POST
@@ -67,22 +92,38 @@ public class UserREST extends AbstractFacade<User> {
     @Consumes({MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_XML})
     public User signIn(User user) throws SelectException {
+        LOGGER.info("before entering try");
         try {
+            // First try to find user with provided credentials
+            LOGGER.info("before calling  signin");
             User userLogged = em.createNamedQuery("signin", User.class)
                             .setParameter("userEmail", user.getEmail())
-                            //.setParameter("userPassword",user.getPassword() )
-                            //decrypr asy
-                            .setParameter("userPassword", HashMD5.hashText(user.getPassword()) )
+                            .setParameter("userPassword", HashMD5.hashText(user.getPassword()))
                             .getSingleResult();
+            LOGGER.info("after calling  signin :" + userLogged.toString());
+
+            // Check if user exists
             if (userLogged == null) {
                 throw new SelectException("Invalid credentials");
             }
-            
-            
+
+//            // Now check user type and cast accordingly
+//            User specificUser = null;
+//            if (userLogged instanceof Admin) {
+//                specificUser = em.find(Admin.class, userLogged.getId());
+//            } else if (userLogged instanceof Trabajador) {
+//                specificUser = em.find(Trabajador.class, userLogged.getId());
+//            } else {
+//                throw new SelectException("Invalid user type");
+//            }
+            // Clean up sensitive data before returning
             em.detach(userLogged);
             userLogged.setPassword(null);
+
             return userLogged;
 
+        } catch (NoResultException nre) {
+            throw new SelectException("Invalid credentials");
         } catch (Exception ex) {
             throw new SelectException("Login failed: " + ex.getMessage());
         }
@@ -93,12 +134,13 @@ public class UserREST extends AbstractFacade<User> {
     @Consumes({MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_XML})
     public User checkExist(User user) {
-        User userExist = new User();
+        // User userExist = new User();
+        User userExist = null;
         try {
             userExist = em.createNamedQuery("findUserByEmail", User.class)
                             .setParameter("userEmail", user.getEmail())
                             .getSingleResult();
-            
+
             em.detach(userExist);
             userExist.setPassword(null);
             userExist.setActivo(true);

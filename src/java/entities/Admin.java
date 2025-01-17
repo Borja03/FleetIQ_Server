@@ -7,39 +7,35 @@ package entities;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Omar
  */
-
-
-
 @Entity
 @DiscriminatorValue("admin")
 @XmlRootElement
-public class Admin extends User  implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Admin extends User {
 
+    //private static final long serialVersionUID = 1L;
     private Date ultimoInicioSesion;
 
     public Admin() {
     }
 
-    public Admin(Date ultimoInicioSesion, String email, String name, String password, String country, String city, String street, Integer zip, String verifcationCode, boolean activo) {
-        super(email, name, password, country, city, street, zip, verifcationCode, activo);
+    // Modified constructor to match User's constructor pattern
+    public Admin(String email, String name, String password, String city,
+                    String street, Integer zip, String verifcationCode,
+                    boolean activo, Date ultimoInicioSesion) {
+        super(email, name, password, city, street, zip, verifcationCode, activo);
         this.ultimoInicioSesion = ultimoInicioSesion;
     }
+
  
+
     public Date getUltimoInicioSesion() {
         return ultimoInicioSesion;
     }
@@ -72,6 +68,5 @@ public class Admin extends User  implements Serializable {
     public String toString() {
         return "Admin{" + "ultimoInicioSesion=" + ultimoInicioSesion + '}';
     }
-
 
 }
