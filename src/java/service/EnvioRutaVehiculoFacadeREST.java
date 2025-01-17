@@ -1,6 +1,8 @@
 package service;
 
 import entities.EnvioRutaVehiculo;
+import entities.Ruta;
+import entities.Vehiculo;
 import exception.CreateException;
 import exception.DeleteException;
 import exception.SelectException;
@@ -18,6 +20,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -36,10 +39,24 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
     }
 
     @POST
-    @Override
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void create(EnvioRutaVehiculo entity) throws CreateException {
-        super.create(entity);
+        try {
+            if (entity.getRuta() == null || entity.getRuta().getLocalizador() == null) {
+                throw new CreateException("El localizador de la ruta es obligatorio.");
+            }
+
+            // Buscar la Ruta por su localizador
+            Ruta ruta = em.createNamedQuery("Ruta.findByLocalizadorInteger", Ruta.class)
+                    .setParameter("localizador", entity.getRuta().getLocalizador())
+                    .getSingleResult();
+            entity.setRuta(ruta);
+
+            // Persistir la entidad
+            super.create(entity);
+        } catch (Exception e) {
+            throw new CreateException("Error al crear el EnvioRutaVehiculo: " + e.getMessage());
+        }
     }
 
     @PUT
@@ -92,28 +109,6 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
                 .setParameter("rutaId", rutaId)
                 .getSingleResult();
         return String.valueOf(count);
-    }
-
-    @POST
-    @Path("assignVehicleToRoute")
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public EnvioRutaVehiculo assignVehicleToRoute(EnvioRutaVehiculo input) throws CreateException {
-        try {
-            if (input.getRuta() == null || input.getVehiculo() == null) {
-                throw new IllegalArgumentException("La ruta y el vehículo son obligatorios.");
-            }
-
-            // Asignar la fecha local del sistema
-            input.setFechaAsignacion(new Date());
-
-            // Insertar en la base de datos
-            em.persist(input);
-
-            return input; // Devolver el objeto creado con su ID generado
-        } catch (Exception e) {
-            throw new CreateException("Error al asignar vehículo a la ruta: " + e.getMessage());
-        }
     }
 
     @Override
