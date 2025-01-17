@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Admin extends User {
 
+
     //private static final long serialVersionUID = 1L;
     private Date ultimoInicioSesion;
 
@@ -33,8 +34,6 @@ public class Admin extends User {
         super(email, name, password, city, street, zip, verifcationCode, activo);
         this.ultimoInicioSesion = ultimoInicioSesion;
     }
-
- 
 
     public Date getUltimoInicioSesion() {
         return ultimoInicioSesion;

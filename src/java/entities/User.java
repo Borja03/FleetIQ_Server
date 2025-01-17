@@ -55,7 +55,6 @@ import javax.xml.bind.annotation.XmlTransient;
 @Table(schema = "FleetIQ", name = "user")
 @XmlSeeAlso({Admin.class, Trabajador.class}) 
 @XmlRootElement
-
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -79,8 +78,6 @@ public class User implements Serializable {
     public User() {
     }
 
-    
-    
     public User(String email, String name, String password, String city, String street, Integer zip, String verifcationCode, boolean activo) {
         // anotation to be unnique
         this.email = email;
