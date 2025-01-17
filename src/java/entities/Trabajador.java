@@ -6,11 +6,8 @@
 package entities;
 
 import java.io.Serializable;
-import java.util.List;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -29,8 +26,9 @@ public class Trabajador extends User implements Serializable {
     public Trabajador() {
     }
 
-    public Trabajador(String departamento, String email, String name, String password, String country, String city, String street, Integer zip, String verifcationCode, boolean activo) {
-        super(email, name, password, country, city, street, zip, verifcationCode, activo);
+    public Trabajador(String email, String name, String password, 
+                    String city, String street, Integer zip, String verifcationCode, boolean activo,String departamento) {
+        super(email, name, password, city, street, zip, verifcationCode, activo);
         this.departamento = departamento;
     }
 
@@ -64,8 +62,8 @@ public class Trabajador extends User implements Serializable {
 
     @Override
     public String toString() {
-        //  return "entitie.Trabajador[ id=" + id + " ]";
-        return null;
+          return "entitie.Trabajador[ id=" + id + " ]";
+
     }
 
 }
