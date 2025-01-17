@@ -65,7 +65,8 @@ public class Admin extends User {
 
     @Override
     public String toString() {
-        return "Admin{" + "ultimoInicioSesion=" + ultimoInicioSesion + '}';
+        return   super.toString() + "Admin{" + "ultimoInicioSesion=" + ultimoInicioSesion + '}';
     }
+
 
 }

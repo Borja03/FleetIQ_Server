@@ -106,20 +106,10 @@ public class UserREST extends AbstractFacade<User> {
             if (userLogged == null) {
                 throw new SelectException("Invalid credentials");
             }
-
-//            // Now check user type and cast accordingly
-//            User specificUser = null;
-//            if (userLogged instanceof Admin) {
-//                specificUser = em.find(Admin.class, userLogged.getId());
-//            } else if (userLogged instanceof Trabajador) {
-//                specificUser = em.find(Trabajador.class, userLogged.getId());
-//            } else {
-//                throw new SelectException("Invalid user type");
-//            }
-            // Clean up sensitive data before returning
+            
             em.detach(userLogged);
             userLogged.setPassword(null);
-
+            LOGGER.info(userLogged.toString());
             return userLogged;
 
         } catch (NoResultException nre) {
