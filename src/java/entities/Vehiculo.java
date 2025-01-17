@@ -69,9 +69,11 @@ public class Vehiculo implements Serializable {
     @Column(name = "capacidad_carga", nullable = true)
     private Integer capacidadCarga;
     
+    @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "registrationDate", nullable = true)
     private Date registrationDate;
     
+    @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "itvDate", nullable = true)
     private Date itvDate;
 
