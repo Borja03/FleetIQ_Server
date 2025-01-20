@@ -12,6 +12,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -20,6 +22,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -188,21 +191,18 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
 
     @DELETE
     @Path("{id}")
-    public void deleteEnvio(@PathParam("id") Integer id) throws DeleteException {
+    public void remove(@PathParam("id") Integer id) {
         try {
-            // Buscar el Envio por id
-            Envio envioToDelete = super.find(id);
+            Envio envio = super.find(id);
 
-            if (envioToDelete == null) {
-                // Si no se encuentra el Envio, lanzar una excepción
-                throw new DeleteException("Envio not found with id: " + id);
+            if (envio == null) {
+                throw new NotFoundException("Envio con ID " + id + " no encontrado.");
             }
-
-            // Eliminar el Envio encontrado
-            super.remove(envioToDelete);
-        } catch (Exception ex) {
-            // En caso de cualquier error, lanzar la excepción DeleteException con el mensaje correspondiente
-            throw new DeleteException("Error deleting Envio: " + ex.getMessage());
+            Logger.getLogger(EnvioFacadeREST.class.getName()).log(Level.WARNING, envio.toString());
+            super.remove(envio);
+            Logger.getLogger(EnvioFacadeREST.class.getName()).log(Level.INFO, "Envio eliminado exitosamente: " + envio.toString());
+        } catch (SelectException | DeleteException ex) {
+            throw new InternalServerErrorException("Error removing Envio entity.", ex);
         }
     }
 
