@@ -9,9 +9,6 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -19,11 +16,24 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Omar
  */
 @Entity
-@DiscriminatorValue("Admin")
+@DiscriminatorValue("admin")
 @XmlRootElement
-public class AdminEntity extends User  implements Serializable {
+public class Admin extends User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private Date ultimoInicioSesion;
+
+    public Admin() {
+    }
+
+    // Modified constructor to match User's constructor pattern
+    public Admin(String email, String name, String password, String city,
+                    String street, Integer zip, String verifcationCode,
+                    boolean activo, Date ultimoInicioSesion) {
+        super(email, name, password, city, street, zip, verifcationCode, activo);
+        this.ultimoInicioSesion = ultimoInicioSesion;
+    }
 
     public Date getUltimoInicioSesion() {
         return ultimoInicioSesion;
@@ -43,10 +53,10 @@ public class AdminEntity extends User  implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof AdminEntity)) {
+        if (!(object instanceof Admin)) {
             return false;
         }
-        AdminEntity other = (AdminEntity) object;
+        Admin other = (Admin) object;
         if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
             return false;
         }
@@ -55,7 +65,7 @@ public class AdminEntity extends User  implements Serializable {
 
     @Override
     public String toString() {
-        return "entitie.AdminEntity[ id=" + id + " ]";
+        return "Admin{" + "ultimoInicioSesion=" + ultimoInicioSesion + '}';
     }
 
 }

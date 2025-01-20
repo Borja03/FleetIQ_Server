@@ -8,45 +8,52 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 @NamedQueries({
-    
     @NamedQuery(
             name = "vfindAll",
             query = "SELECT v FROM Vehiculo v"
-    ),
+    )
+    ,
     @NamedQuery(
             name = "findByCapacity",
             query = "SELECT v FROM Vehiculo v WHERE v.capacidadCarga = :capacidadCarga"
-    ),
+    )
+    ,
     @NamedQuery(
             name = "findByDateRangeITV",
             query = "SELECT v FROM Vehiculo v WHERE v.itvDate BETWEEN :startDate AND :endDate"
-    ),
+    )
+    ,
     @NamedQuery(
             name = "findByDateRangeRegistration",
             query = "SELECT v FROM Vehiculo v WHERE v.registrationDate BETWEEN :startDate AND :endDate"
-    ),
+    )
+    ,
     @NamedQuery(
             name = "findByPlate",
             query = "SELECT v FROM Vehiculo v WHERE LOWER(v.matricula) LIKE LOWER(:matricula)"
-    ),
+    )
+    ,
     @NamedQuery(
             name = "findAfterDateITV",
             query = "SELECT v FROM Vehiculo v WHERE v.itvDate >= :startDate"
-    ),
+    )
+    ,
     @NamedQuery(
             name = "findAfterDateRegistration",
             query = "SELECT v FROM Vehiculo v WHERE v.registrationDate >= :startDate"
-    ),
+    )
+    ,
     @NamedQuery(
             name = "findBeforeDateITV",
             query = "SELECT v FROM Vehiculo v WHERE v.itvDate <= :endDate"
-    ),
+    )
+    ,
     @NamedQuery(
             name = "findBeforeDateRegistration",
             query = "SELECT v FROM Vehiculo v WHERE v.registrationDate <= :endDate"
     )
-})
 
+})
 
 /**
  * Entidad JPA que representa un Vehículo.
@@ -68,21 +75,22 @@ public class Vehiculo implements Serializable {
 
     @Column(name = "capacidad_carga", nullable = true)
     private Integer capacidadCarga;
-    
+
+    @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "registrationDate", nullable = true)
     private Date registrationDate;
-    
+
+    @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "itvDate", nullable = true)
     private Date itvDate;
 
     @Column(name = "activo", nullable = false)
-    private boolean activo; // Ejemplo: "Disponible", "En uso", "Mantenimiento"
+    private boolean activo; 
 
     @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<EnvioRutaVehiculo> envioRutaVehiculoList;
 
     // Getters y Setters
-
     public Integer getId() {
         return id;
     }
@@ -138,7 +146,6 @@ public class Vehiculo implements Serializable {
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
-   
 
     @XmlTransient
     public List<EnvioRutaVehiculo> getEnvioRutaVehiculoList() {

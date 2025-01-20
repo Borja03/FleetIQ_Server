@@ -6,43 +6,55 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlRootElement;
-
+import javax.xml.bind.annotation.XmlTransient;
 
 @NamedQueries({
     @NamedQuery(
-        name = "Ruta.findAll",
-        query = "SELECT r FROM Ruta r"
-    ),
-    @NamedQuery(
-        name = "Ruta.filterBy2Dates",
-        query = "SELECT r FROM Ruta r WHERE r.fechaCreacion BETWEEN :firstDate AND :secondDate"
-    ),
-    @NamedQuery(
-        name = "Ruta.filterTiempoMayor",
-        query = "SELECT r FROM Ruta r WHERE r.tiempo > :tiempo"
-    ),
-    @NamedQuery(
-        name = "Ruta.filterTiempoMenor",
-        query = "SELECT r FROM Ruta r WHERE r.tiempo < :tiempo"
-    ),
-    @NamedQuery(
-        name = "Ruta.filterTiempoIgual",
-        query = "SELECT r FROM Ruta r WHERE r.tiempo = :tiempo"
-    ),
-    @NamedQuery(
-        name = "Ruta.filterDistanciaMayor",
-        query = "SELECT r FROM Ruta r WHERE r.distancia > :distancia"
-    ),
-    @NamedQuery(
-        name = "Ruta.filterDistanciaMenor",
-        query = "SELECT r FROM Ruta r WHERE r.distancia < :distancia"
-    ),
-    @NamedQuery(
-        name = "Ruta.filterDistanciaIgual",
-        query = "SELECT r FROM Ruta r WHERE r.distancia = :distancia"
+            name = "Ruta.findAll",
+            query = "SELECT r FROM Ruta r"
     )
-})
+    ,
+    @NamedQuery(
+            name = "Ruta.filterBy2Dates",
+            query = "SELECT r FROM Ruta r WHERE r.fechaCreacion BETWEEN :firstDate AND :secondDate"
+    )
+    ,
+    @NamedQuery(
+            name = "Ruta.filterTiempoMayor",
+            query = "SELECT r FROM Ruta r WHERE r.tiempo > :tiempo"
+    )
+    ,
+    @NamedQuery(
+            name = "Ruta.filterTiempoMenor",
+            query = "SELECT r FROM Ruta r WHERE r.tiempo < :tiempo"
+    )
+    ,
+    @NamedQuery(
+            name = "Ruta.filterTiempoIgual",
+            query = "SELECT r FROM Ruta r WHERE r.tiempo = :tiempo"
+    )
+    ,
+    @NamedQuery(
+            name = "Ruta.filterDistanciaMayor",
+            query = "SELECT r FROM Ruta r WHERE r.distancia > :distancia"
+    )
+    ,
+    @NamedQuery(
+            name = "Ruta.filterDistanciaMenor",
+            query = "SELECT r FROM Ruta r WHERE r.distancia < :distancia"
+    )
+    ,
+    @NamedQuery(
+            name = "Ruta.filterDistanciaIgual",
+            query = "SELECT r FROM Ruta r WHERE r.distancia = :distancia"
+    )
+    ,
+     @NamedQuery(
+            name = "Ruta.findByLocalizadorInteger",
+            query = "SELECT r FROM Ruta r WHERE r.localizador = :localizador"
+    )
 
+})
 
 /**
  * Entidad JPA que representa una ruta.
@@ -67,7 +79,7 @@ public class Ruta implements Serializable {
 
     @Column(name = "tiempo", nullable = false)
     private Integer tiempo;
-    
+
     @Temporal(TemporalType.DATE)
     @Column(name = "fecha_creacion", nullable = false)
     private Date fechaCreacion;
@@ -84,7 +96,8 @@ public class Ruta implements Serializable {
     private Integer numVehiculos;
 
     @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-private List<EnvioRutaVehiculo> envioRutaVehiculos;
+    //@XmlTransient
+    private List<EnvioRutaVehiculo> envioRutaVehiculos;
 
     // Getters and Setters
     public Integer getLocalizador() {
@@ -150,15 +163,14 @@ private List<EnvioRutaVehiculo> envioRutaVehiculos;
     public void setEnvioRutaVehiculos(List<EnvioRutaVehiculo> envioRutaVehiculos) {
         this.envioRutaVehiculos = envioRutaVehiculos;
     }
-    
-    public Integer getId() {
-    return localizador;
-}
 
+    public Integer getId() {
+        return localizador;
+    }
 
     @Override
     public String toString() {
-        return "Ruta{" + "localizador=" + localizador + ", origen=" + origen + ", destino=" + destino + ", distancia=" + distancia + ", tiempo=" + tiempo + ", fechaCreacion=" + fechaCreacion + ", numVehiculos=" + numVehiculos + ", envioRutaVehiculos=" + envioRutaVehiculos + '}';
+        return "Ruta{" + "localizador=" + localizador + ", origen=" + origen + ", destino=" + destino + ", distancia=" + distancia + ", tiempo=" + tiempo + ", fechaCreacion=" + fechaCreacion + ", numVehiculos=" + numVehiculos;
     }
-    
+
 }

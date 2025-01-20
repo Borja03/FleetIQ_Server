@@ -25,36 +25,35 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author Omar
  */
-
-
 @NamedQueries({
     @NamedQuery(
-            name = "findAllUsers",
-            query = "Select u From User u")
+                    name = "findAllUsers",
+                    query = "Select u From User u")
     ,
    @NamedQuery(
-            name = "signin",
-            query = "SELECT u FROM User u WHERE u.email = :userEmail AND u.password = :userPassword"
+                    name = "signin",
+                    query = "SELECT u FROM User u WHERE u.email = :userEmail AND u.password = :userPassword"
     )
     ,
    @NamedQuery(
-            name = "findUserByEmail",
-            query = "SELECT u FROM User u WHERE u.email=:userEmail")
-   
+                    name = "findUserByEmail",
+                    query = "SELECT u FROM User u WHERE u.email=:userEmail")
+
 })
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
 @Table(schema = "FleetIQ", name = "user")
+//@XmlSeeAlso({Admin.class, Trabajador.class}) 
 @XmlRootElement
 public class User implements Serializable {
 
@@ -66,17 +65,34 @@ public class User implements Serializable {
     private String email;
     private String name;
     private String password;
-    private String country;
     private String city;
     private String street;
     private Integer zip;
+    private String verifcationCode;
     private boolean activo;
-    
-//   @Enumerated(EnumType.STRING)
-//    private UserType userType;
+
+    @Column(insertable = false, updatable = false)
+    //@Enumerated(EnumType.STRING)
+    private String user_type;
+
+    public User() {
+    }
+
+    public User(String email, String name, String password, String city, String street, Integer zip, String verifcationCode, boolean activo) {
+        // anotation to be unnique
+        this.email = email;
+        this.name = name;
+        this.password = password;
+        this.city = city;
+        this.street = street;
+        this.zip = zip;
+        this.verifcationCode = verifcationCode;
+        this.activo = activo;
+    }
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
-                    schema = "FleetIQ",  name = "user_envio",
+                    schema = "FleetIQ", name = "user_envio",
                     joinColumns = @JoinColumn(name = "user_id"),
                     inverseJoinColumns = @JoinColumn(name = "envio_id")
     )
@@ -114,14 +130,6 @@ public class User implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
     }
 
     public String getCity() {
@@ -164,6 +172,22 @@ public class User implements Serializable {
         this.activo = activo;
     }
 
+    public String getVerifcationCode() {
+        return verifcationCode;
+    }
+
+    public void setVerifcationCode(String verifcationCode) {
+        this.verifcationCode = verifcationCode;
+    }
+
+    public String getUser_type() {
+        return user_type;
+    }
+
+    public void setUser_type(String user_type) {
+        this.user_type = user_type;
+    }
+
     //
     @Override
     public int hashCode() {
@@ -174,7 +198,7 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        return "Entities.CustomerEntity[ id=" + id + " ]";
+        return "User{" + "id=" + id + ", email=" + email + ", name=" + name + ", password=" + password + ", city=" + city + ", street=" + street + ", zip=" + zip + ", verifcationCode=" + verifcationCode + ", activo=" + activo + ", enviosList=" + enviosList + '}';
     }
 
 }

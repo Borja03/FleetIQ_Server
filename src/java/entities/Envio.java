@@ -6,29 +6,38 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-    @NamedQueries({
-        @NamedQuery(
+@NamedQueries({
+    @NamedQuery(
             name = "Envio.findAll",
             query = "SELECT e FROM Envio e"
-        ),
-        @NamedQuery(
-            name = "Ruta.filterByDates",
+    )
+    ,
+    @NamedQuery(
+            name = "Envio.filterByDates",
             query = "SELECT e FROM Envio e WHERE e.fechaEnvio BETWEEN :firstDate AND :secondDate"
-        ),
-        @NamedQuery(
-            name = "Ruta.filterEstado",
+    )
+    ,
+    @NamedQuery(
+            name = "Envio.filterEstado",
             query = "SELECT e FROM Envio e WHERE e.estado = :estado"
-        ),
-        @NamedQuery(
-            name = "Ruta.filterNumPaquetes",
-            query = "SELECT e FROM Envio e WHERE e.numPaquetes = :numPaquetes"
-        ),
-    })
+    )
+    ,
+    @NamedQuery(
+            name = "Envio.filterNumPaquetes",
+            query = "SELECT e FROM Envio e WHERE e.numPaquetes < :numPaquetes"
+    )
+    ,
+    @NamedQuery(
+            name = "Envio.getRutaYEnvioRutaVehiculoPorVehiculo",
+            query = "SELECT erv.ruta.localizador, erv.id FROM EnvioRutaVehiculo erv WHERE erv.vehiculo.id = :vehiculoId"
+    ),
+})
 
 /**
  * Entidad JPA que representa un Envío.
@@ -66,17 +75,17 @@ public class Envio implements Serializable {
     @Column(name = "vehiculo", length = 10)
     private String vehiculo;
 
-     @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "envio_ruta_vehiculo_id", nullable = false)
     private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(mappedBy = "enviosList")
     private List<User> userList;
 
-    @OneToMany(cascade=ALL,mappedBy="envio",fetch=EAGER)
+    @OneToMany(cascade = ALL, mappedBy = "envio", fetch = EAGER)
     private List<Paquete> packageList;
-    
 
+    // Métodos de acceso (getters y setters) de los campos transitorios
     @XmlTransient
     public List<Paquete> getPackageList() {
         return packageList;
@@ -84,6 +93,14 @@ public class Envio implements Serializable {
 
     public void setPackageList(List<Paquete> packageList) {
         this.packageList = packageList;
+    }
+
+    public EnvioRutaVehiculo getEnvioRutaVehiculo() {
+        return envioRutaVehiculo;
+    }
+
+    public void setEnvioRutaVehiculo(EnvioRutaVehiculo envioRutaVehiculo) {
+        this.envioRutaVehiculo = envioRutaVehiculo;
     }
 
     @XmlTransient
@@ -95,7 +112,7 @@ public class Envio implements Serializable {
         this.userList = userList;
     }
 
-    // Getters y Setters
+    // Getters y Setters de otros campos
     public Integer getId() {
         return id;
     }
@@ -158,6 +175,25 @@ public class Envio implements Serializable {
 
     public void setVehiculo(String vehiculo) {
         this.vehiculo = vehiculo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;  // Si ambos objetos son la misma referencia
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;  // Si no son del mismo tipo
+        }
+        Envio envio = (Envio) o;  // Convertir el objeto al tipo correcto
+
+        return Objects.equals(id, envio.id);  // Comparar el id de los envíos (suponiendo que id es único)
+    }
+
+    // Implementación del método hashCode
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);  // El hashcode se basa en el id único
     }
 
     @Override
