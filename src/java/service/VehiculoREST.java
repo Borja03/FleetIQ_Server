@@ -20,6 +20,7 @@ import javax.swing.text.DateFormatter;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -50,7 +51,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
         try {
             super.create(entity);
         } catch (Exception e) {
-            throw new CreateException("Error creating vehicle: " + e.getMessage());
+            throw new InternalServerErrorException("Error creating vehicle: " + e.getMessage());
         }
     }
 
@@ -61,7 +62,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
         try {
             super.edit(entity);
         } catch (Exception e) {
-            throw new UpdateException("Error updating vehicle: " + e.getMessage());
+            throw new InternalServerErrorException("Error updating vehicle: " + e.getMessage());
         }
     }
 
@@ -71,7 +72,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
         try {
             super.remove(super.find(id));
         } catch (Exception e) {
-            throw new DeleteException("Error deleting vehicle: " + e.getMessage());
+            throw new InternalServerErrorException("Error deleting vehicle: " + e.getMessage());
         }
     }
 
@@ -82,7 +83,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
         try {
             return super.find(id);
         } catch (Exception e) {
-            throw new SelectException("Error finding vehicle: " + e.getMessage());
+            throw new InternalServerErrorException("Error finding vehicle: " + e.getMessage());
         }
     }
 
@@ -93,7 +94,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
         try {
             return super.findAll();
         } catch (Exception e) {
-            throw new SelectException("Error retrieving vehicles: " + e.getMessage());
+            throw new InternalServerErrorException("Error retrieving vehicles: " + e.getMessage());
         }
     }
 
@@ -104,7 +105,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
         try {
             return super.findRange(new int[]{from, to});
         } catch (Exception e) {
-            throw new SelectException("Error finding vehicle range: " + e.getMessage());
+            throw new InternalServerErrorException("Error finding vehicle range: " + e.getMessage());
         }
     }
 
@@ -115,7 +116,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
         try {
             return String.valueOf(super.count());
         } catch (Exception e) {
-            return "Error counting vehicles: " + e.getMessage();
+            throw new InternalServerErrorException("Error counting vehicles: " + e.getMessage());
         }
     }
 
@@ -128,7 +129,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
                     .setParameter("capacidadCarga", capacity)
                     .getResultList();
         } catch (Exception e) {
-            return null;
+            throw new InternalServerErrorException("Error finding vehicle by capacity: " + e.getMessage());
         }
     }
 
@@ -141,7 +142,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
                     .setParameter("matricula", "%" + matricula + "%")
                     .getResultList();
         } catch (Exception e) {
-            return null;
+           throw new InternalServerErrorException("Error finding vehicle by plate: " + e.getMessage());
         }
     }
 
@@ -166,7 +167,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
             javax.persistence.TypedQuery<Vehiculo> query = em.createQuery(queryStr, Vehiculo.class);
             return query.getResultList();
         } catch (Exception e) {
-            throw new SelectException("Error finding vehicles by date range: " + e.getMessage());
+            throw new InternalServerErrorException("Error finding vehicles by date range: " + e.getMessage());
         }
     }
 

@@ -11,49 +11,45 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(
             name = "vfindAll",
             query = "SELECT v FROM Vehiculo v"
-    )
-    ,
+    ),
     @NamedQuery(
             name = "findByCapacity",
             query = "SELECT v FROM Vehiculo v WHERE v.capacidadCarga = :capacidadCarga"
-    )
-    ,
+    ),
     @NamedQuery(
             name = "findByDateRangeITV",
             query = "SELECT v FROM Vehiculo v WHERE v.itvDate BETWEEN :startDate AND :endDate"
-    )
-    ,
+    ),
     @NamedQuery(
             name = "findByDateRangeRegistration",
             query = "SELECT v FROM Vehiculo v WHERE v.registrationDate BETWEEN :startDate AND :endDate"
-    )
-    ,
+    ),
     @NamedQuery(
             name = "findByPlate",
             query = "SELECT v FROM Vehiculo v WHERE LOWER(v.matricula) LIKE LOWER(:matricula)"
-    )
-    ,
+    ),
     @NamedQuery(
             name = "findAfterDateITV",
             query = "SELECT v FROM Vehiculo v WHERE v.itvDate >= :startDate"
-    )
-    ,
+    ),
     @NamedQuery(
             name = "findAfterDateRegistration",
             query = "SELECT v FROM Vehiculo v WHERE v.registrationDate >= :startDate"
-    )
-    ,
+    ),
     @NamedQuery(
             name = "findBeforeDateITV",
             query = "SELECT v FROM Vehiculo v WHERE v.itvDate <= :endDate"
-    )
-    ,
+    ),
     @NamedQuery(
             name = "findBeforeDateRegistration",
             query = "SELECT v FROM Vehiculo v WHERE v.registrationDate <= :endDate"
+    ),
+    @NamedQuery(
+            name = "findAssignmentDetailsByVehicleId",
+            query = "SELECT e.fechaAsignacion, e.ruta.id FROM EnvioRutaVehiculo e WHERE e.vehiculo.id = :vehiculoId"
     )
-
 })
+
 
 /**
  * Entidad JPA que representa un Vehículo.
@@ -85,7 +81,7 @@ public class Vehiculo implements Serializable {
     private Date itvDate;
 
     @Column(name = "activo", nullable = false)
-    private boolean activo; 
+    private boolean activo;
 
     @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<EnvioRutaVehiculo> envioRutaVehiculoList;
