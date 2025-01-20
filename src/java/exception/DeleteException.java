@@ -6,12 +6,11 @@
 
 package exception;
 
-
 /**
  *
  * @author Alder
  */
-public class DeleteException extends Exception  {
+public class DeleteException extends Exception {
 
     /**
      * Creates a new instance of <code>createException</code> without detail

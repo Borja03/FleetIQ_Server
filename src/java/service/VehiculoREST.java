@@ -33,7 +33,7 @@ import javax.ws.rs.core.MediaType;
  * @author 2dam
  */
 @Stateless
-@Path("vehiculo")
+@Path("entities.vehiculo")
 public class VehiculoREST extends AbstractFacade<Vehiculo> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")

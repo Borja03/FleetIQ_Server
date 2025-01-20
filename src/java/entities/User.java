@@ -61,10 +61,9 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String email;
     private String name;
-    @Column(nullable = false)
     private String password;
     private String city;
     private String street;

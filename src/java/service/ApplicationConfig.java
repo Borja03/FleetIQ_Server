@@ -29,7 +29,6 @@ public class ApplicationConfig extends Application {
      * out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(exception.CrudExceptionMapper.class);
         resources.add(service.EnvioFacadeREST.class);
         resources.add(service.EnvioRutaVehiculoFacadeREST.class);
         resources.add(service.PackageREST.class);
