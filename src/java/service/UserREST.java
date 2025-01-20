@@ -15,11 +15,16 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import utils.EmailSender;
 import utils.Utils;
 
 /**
- * RESTful service for User management.
+ *
+ * @author Omar
+ */
+/**
+ * REST service for User entity management.
  */
 @Stateless
 @Path("user")
@@ -28,7 +33,8 @@ public class UserREST extends AbstractFacade<User> {
     private static final Logger LOGGER = Logger.getLogger(UserREST.class.getName());
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
     private EntityManager em;
-    private final SymmetricDecrypt symDecrypt = new SymmetricDecrypt();
+
+    SymmetricDecrypt symmetricDecrypt = new SymmetricDecrypt();
 
     public UserREST() {
         super(User.class);
@@ -37,13 +43,13 @@ public class UserREST extends AbstractFacade<User> {
     @POST
     @Override
     @Consumes({MediaType.APPLICATION_XML})
-    public void create(User entity) throws CreateException {
+    public void create(User entity) {
         try {
-            LOGGER.log(Level.INFO, "Creating user with email: {0}", entity.getEmail());
+            LOGGER.log(Level.INFO, "Creating user with ID: {0}", entity.getId());
             super.create(entity);
-        } catch (Exception ex) {
+        } catch (CreateException ex) {
             LOGGER.log(Level.SEVERE, "Error creating user: {0}", ex.getMessage());
-            throw new InternalServerErrorException("Failed to create user.");
+            throw new InternalServerErrorException("Unable to create user: " + ex.getMessage());
         }
     }
 
@@ -51,38 +57,56 @@ public class UserREST extends AbstractFacade<User> {
     @Path("signup")
     @Consumes({MediaType.APPLICATION_XML})
     public User signUp(User entity) {
-        LOGGER.log(Level.INFO, "User signup attempt: {0}", entity.getEmail());
         try {
+            LOGGER.log(Level.INFO, "User signup initiated for email: {0}", entity.getEmail());
+            // Check if user already exists by email
+            try {
+                User existingUser = em.createNamedQuery("findUserByEmail", User.class)
+                                .setParameter("userEmail", entity.getEmail())
+                                .getSingleResult();
+                if (existingUser != null) {
+                    LOGGER.log(Level.WARNING, "User already exists with email: {0}", entity.getEmail());
+                    throw new NotAuthorizedException("User already exists with this email.");
+                }
+            } catch (NoResultException ex) {
+                LOGGER.log(Level.INFO, "No existing user found with email: {0}", entity.getEmail());
+            }
+            // Hash the password
             entity.setPassword(HashMD5.hashText(entity.getPassword()));
+
+            // Determine user type and create corresponding entity
             User newUser;
-            if ("admin".equalsIgnoreCase(entity.getUser_type())) {
-                LOGGER.info("Registering as Admin.");
+            if ("admin".equals(entity.getUser_type())) {
                 newUser = new Admin();
-            } else if ("trabajador".equalsIgnoreCase(entity.getUser_type())) {
-                LOGGER.info("Registering as Trabajador.");
+                if (entity instanceof Admin) {
+                    ((Admin) newUser).setUltimoInicioSesion(((Admin) entity).getUltimoInicioSesion());
+                }
+            } else if ("trabajador".equals(entity.getUser_type())) {
                 newUser = new Trabajador();
+                if (entity instanceof Trabajador) {
+                    ((Trabajador) newUser).setDepartamento(((Trabajador) entity).getDepartamento());
+                }
             } else {
-                LOGGER.warning("Invalid user type during signup.");
-                throw new NotAuthorizedException("Invalid user type.");
+                LOGGER.severe("Invalid user type");
+                throw new InternalServerErrorException("Invalid user type provided.");
             }
-            if (em.contains(entity)) {
-                LOGGER.warning("email already existe.");
-                throw new NotAuthorizedException("email already existe");
-            }
+            // Set common properties
             newUser.setId(entity.getId());
             newUser.setName(entity.getName());
+            newUser.setActivo(entity.isActivo());
             newUser.setCity(entity.getCity());
             newUser.setEmail(entity.getEmail());
-            newUser.setPassword(entity.getPassword());
             newUser.setStreet(entity.getStreet());
             newUser.setZip(entity.getZip());
+            newUser.setVerifcationCode(entity.getVerifcationCode());
+            newUser.setEnviosList(entity.getEnviosList());
+            newUser.setUser_type(entity.getUser_type());
+
+            // Save the new user
             super.create(newUser);
 
-            em.detach(newUser);
-            newUser.setPassword(null);
-            LOGGER.log(Level.INFO, "User {0} signed up successfully.", newUser.getEmail());
             return newUser;
-        } catch (Exception ex) {
+        } catch ( Exception ex) {
             LOGGER.log(Level.SEVERE, "Error during signup: {0}", ex.getMessage());
             throw new InternalServerErrorException("Signup failed: " + ex.getMessage());
         }
@@ -93,26 +117,45 @@ public class UserREST extends AbstractFacade<User> {
     @Consumes({MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_XML})
     public User signIn(User user) {
-        LOGGER.log(Level.INFO, "User login attempt: {0}", user.getEmail());
         try {
-            User userLogged = em.createNamedQuery("signin", User.class)
+            LOGGER.log(Level.INFO, "User login attempt: {0}", user.getEmail());
+            User loggedInUser = em.createNamedQuery("signin", User.class)
                             .setParameter("userEmail", user.getEmail())
                             .setParameter("userPassword", HashMD5.hashText(user.getPassword()))
                             .getSingleResult();
-            if (userLogged == null) {
-                LOGGER.warning("Invalid login credentials for user: " + user.getEmail());
-                throw new NotAuthorizedException("Invalid credentials.");
-            }
-            em.detach(userLogged);
-            userLogged.setPassword(null);
-            LOGGER.log(Level.INFO, "User {0} logged in successfully.", userLogged.getEmail());
-            return userLogged;
+            em.detach(loggedInUser);
+            loggedInUser.setPassword(null);
+            return loggedInUser;
         } catch (NoResultException ex) {
-            LOGGER.warning("Login failed - no user found: " + user.getEmail());
-            throw new NotAuthorizedException("Invalid credentials.");
+            LOGGER.log(Level.WARNING, "Invalid login credentials: {0}", user.getEmail());
+            throw new NotAuthorizedException("Invalid login credentials.");
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Error during login: {0}", ex.getMessage());
+            LOGGER.log(Level.SEVERE, "Login failed: {0}", ex.getMessage());
             throw new InternalServerErrorException("Login failed: " + ex.getMessage());
+        }
+    }
+
+    @POST
+    @Path("check-exist")
+    @Consumes({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML})
+    public User checkExist(User user) {
+        try {
+            LOGGER.log(Level.INFO, "Checking existence for email: {0}", user.getEmail());
+            User existingUser = em.createNamedQuery("findUserByEmail", User.class)
+                            .setParameter("userEmail", user.getEmail())
+                            .getSingleResult();
+            em.detach(existingUser);
+            existingUser.setPassword(null);
+            existingUser.setActivo(true);
+            return existingUser;
+        } catch (NoResultException ex) {
+            LOGGER.log(Level.INFO, "User does not exist: {0}", user.getEmail());
+            user.setActivo(false);
+            return user;
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error checking user existence: {0}", ex.getMessage());
+            throw new InternalServerErrorException("Error checking user existence.");
         }
     }
 
@@ -120,22 +163,24 @@ public class UserREST extends AbstractFacade<User> {
     @Path("reset")
     @Consumes({MediaType.APPLICATION_XML})
     public void resetPassword(User user) {
-        LOGGER.log(Level.INFO, "Reset password attempt for user: {0}", user.getEmail());
         try {
-            User userExist = em.createNamedQuery("findUserByEmail", User.class)
+            LOGGER.log(Level.INFO, "Password reset initiated for email: {0}", user.getEmail());
+            User existingUser = em.createNamedQuery("findUserByEmail", User.class)
                             .setParameter("userEmail", user.getEmail())
                             .getSingleResult();
-            if (userExist != null) {
+            if (existingUser != null) {
                 String resetCode = Utils.generateRandomCode();
-                String[] credentials = symDecrypt.descifrarCredenciales();
-                EmailSender.sendEmail(credentials[0], credentials[1], user.getEmail(), resetCode, "reset");
-                userExist.setVerifcationCode(resetCode);
-                em.merge(userExist);
-                LOGGER.log(Level.INFO, "Reset code sent to user: {0}", user.getEmail());
+                String[] credentials = symmetricDecrypt.descifrarCredenciales();
+                EmailSender.sendEmail(credentials[0], credentials[1], user.getEmail(), resetCode, "rest");
+                existingUser.setVerifcationCode(resetCode);
+                //em.merge(existingUser);
+                super.edit(existingUser);
             }
+        } catch (UpdateException ex) {
+            LOGGER.log(Level.SEVERE, "Error during password reset: {0}", ex.getMessage());
+            throw new InternalServerErrorException("Password reset failed.");
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Error resetting password: {0}", ex.getMessage());
-            throw new InternalServerErrorException("Failed to reset password.");
+            Logger.getLogger(UserREST.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -143,35 +188,39 @@ public class UserREST extends AbstractFacade<User> {
     @Path("update-password")
     @Consumes({MediaType.APPLICATION_XML})
     public void updatePassword(User user) {
-        LOGGER.log(Level.INFO, "Updating password for user: {0}", user.getEmail());
         try {
-            User dbUser = em.createNamedQuery("findUserByEmail", User.class)
+            LOGGER.log(Level.INFO, "Updating password for email: {0}", user.getEmail());
+            User existingUser = em.createNamedQuery("findUserByEmail", User.class)
                             .setParameter("userEmail", user.getEmail())
                             .getSingleResult();
-            if (dbUser != null) {
-                dbUser.setPassword(HashMD5.hashText(user.getPassword()));
-                em.merge(dbUser);
-                String[] credentials = symDecrypt.descifrarCredenciales();
+            if (existingUser != null) {
+                existingUser.setPassword(HashMD5.hashText(user.getPassword()));
+                super.edit(existingUser);
+                //em.merge(existingUser);
+
+                String[] credentials = symmetricDecrypt.descifrarCredenciales();
                 EmailSender.sendEmail(credentials[0], credentials[1], user.getEmail(), "", "changed");
-                LOGGER.log(Level.INFO, "Password updated successfully for user: {0}", user.getEmail());
             }
-        } catch (Exception ex) {
+        } catch (UpdateException ex) {
             LOGGER.log(Level.SEVERE, "Error updating password: {0}", ex.getMessage());
-            throw new InternalServerErrorException("Failed to update password.");
+            throw new InternalServerErrorException("Password update failed.");
+        } catch (Exception ex) {
+            Logger.getLogger(UserREST.class.getName()).log(Level.SEVERE, null, ex);
+            throw new InternalServerErrorException("Password update failed.");
+
         }
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML})
-    public List<User> findAll() throws SelectException {
+    public List<User> findAll() {
         try {
-            List<User> users = super.findAll();
-            LOGGER.log(Level.INFO, "Retrieved all users.");
-            return users;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to fetch users: {0}", e.getMessage());
-            throw new SelectException("Unable to fetch users.");
+            LOGGER.log(Level.INFO, "Fetching all users.");
+            return super.findAll();
+        } catch (SelectException ex) {
+            LOGGER.log(Level.SEVERE, "Error fetching all users: {0}", ex.getMessage());
+            throw new InternalServerErrorException("Failed to retrieve users.");
         }
     }
 
