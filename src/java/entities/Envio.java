@@ -75,8 +75,8 @@ public class Envio implements Serializable {
     @Column(name = "vehiculo", length = 10)
     private String vehiculo;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "envio_ruta_vehiculo_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
+    @JoinColumn(name = "envio_ruta_vehiculo_id", nullable = true)
     private EnvioRutaVehiculo envioRutaVehiculo;
 
     @ManyToMany(mappedBy = "enviosList")
