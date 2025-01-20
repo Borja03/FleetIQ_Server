@@ -95,8 +95,8 @@ public class Ruta implements Serializable {
     @Column(name = "num_vehiculos", nullable = true)
     private Integer numVehiculos;
 
-    @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @XmlTransient
+    @OneToMany(mappedBy = "ruta", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    //@XmlTransient
     private List<EnvioRutaVehiculo> envioRutaVehiculos;
 
     // Getters and Setters

@@ -53,7 +53,7 @@ import javax.xml.bind.annotation.XmlTransient;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)
 @Table(schema = "FleetIQ", name = "user")
-@XmlSeeAlso({Admin.class, Trabajador.class}) 
+//@XmlSeeAlso({Admin.class, Trabajador.class}) 
 @XmlRootElement
 public class User implements Serializable {
 
@@ -61,9 +61,10 @@ public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected Long id;
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
     private String name;
+    @Column(nullable = false)
     private String password;
     private String city;
     private String street;

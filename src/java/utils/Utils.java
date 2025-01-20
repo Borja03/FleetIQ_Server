@@ -27,14 +27,9 @@ public class Utils {
     }
     
     
-        private String generateSecureVerificationCode() {
-        SecureRandom random = new SecureRandom();
-        StringBuilder code = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
-            code.append(random.nextInt(10));
-        }
-        return code.toString();
-    }
+ 
+    
+    
 
     
     

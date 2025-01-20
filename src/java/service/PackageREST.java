@@ -66,7 +66,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
         try {
             Paquete existingPackage = super.find(paquete.getId());
             if (existingPackage == null) {
-                throw new UpdateException("Package not found with id: " + paquete.getId());
+                throw new SelectException("Package not found with id: " + paquete.getId());
             }
             super.edit(paquete);
             return paquete;
@@ -81,7 +81,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
         try {
             Paquete packageToDelete = super.find(id);
             if (packageToDelete == null) {
-                throw new DeleteException("Package not found with id: " + id);
+                throw new SelectException("Package not found with id: " + id);
             }
             super.remove(packageToDelete);
         } catch (Exception ex) {

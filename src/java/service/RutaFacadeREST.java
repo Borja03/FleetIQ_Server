@@ -1,11 +1,14 @@
 package service;
 
+import entities.EnvioRutaVehiculo;
 import entities.Ruta;
 import exception.CreateException;
 import exception.DeleteException;
 import exception.SelectException;
 import exception.UpdateException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -39,9 +42,15 @@ public class RutaFacadeREST extends AbstractFacade<Ruta> {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void create(Ruta entity) {
         try {
-            super.create(entity);
+            if (entity.getLocalizador() != null) {
+                super.edit(entity); // Using edit (which internally uses merge)
+            } else {
+                super.create(entity); // Persist new entity
+            }
         } catch (CreateException ex) {
             throw new InternalServerErrorException("Error creating Ruta entity.", ex);
+        } catch (UpdateException ex) {
+            Logger.getLogger(RutaFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -50,7 +59,16 @@ public class RutaFacadeREST extends AbstractFacade<Ruta> {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void edit(@PathParam("id") Integer id, Ruta entity) {
         try {
-            super.edit(entity);
+            // Ensure that envioRutaVehiculos is properly managed and not null
+            if (entity.getEnvioRutaVehiculos() != null) {
+                for (EnvioRutaVehiculo envio : entity.getEnvioRutaVehiculos()) {
+                    // Ensure each EnvioRutaVehiculo is linked properly
+                    envio.setRuta(entity); // or whatever relationship needs to be set
+                }
+            }
+
+            super.edit(entity); // Assuming super.edit handles the update
+
         } catch (UpdateException ex) {
             throw new InternalServerErrorException("Error updating Ruta entity.", ex);
         }

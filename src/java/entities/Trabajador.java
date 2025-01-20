@@ -18,8 +18,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @DiscriminatorValue("trabajador")
 @XmlRootElement
-public class Trabajador extends User {
-//    private static final long serialVersionUID = 1L;
+public class Trabajador extends User implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String departamento;
 
@@ -31,7 +31,6 @@ public class Trabajador extends User {
         super(email, name, password, city, street, zip, verifcationCode, activo);
         this.departamento = departamento;
     }
-
 
     public String getDepartamento() {
         return departamento;

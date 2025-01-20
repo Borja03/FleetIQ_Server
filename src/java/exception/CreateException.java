@@ -6,11 +6,12 @@
 
 package exception;
 
+
 /**
  *
  * @author Alder
  */
-public class CreateException extends Exception {
+public class CreateException extends Exception  {
 
     /**
      * Creates a new instance of <code>createException</code> without detail

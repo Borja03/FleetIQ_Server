@@ -18,10 +18,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @DiscriminatorValue("admin")
 @XmlRootElement
-public class Admin extends User {
+public class Admin extends User implements Serializable {
 
+    private static final long serialVersionUID = 1L;
 
-    //private static final long serialVersionUID = 1L;
     private Date ultimoInicioSesion;
 
     public Admin() {
@@ -65,8 +65,7 @@ public class Admin extends User {
 
     @Override
     public String toString() {
-        return   super.toString() + "Admin{" + "ultimoInicioSesion=" + ultimoInicioSesion + '}';
+        return "Admin{" + "ultimoInicioSesion=" + ultimoInicioSesion + '}';
     }
-
 
 }
