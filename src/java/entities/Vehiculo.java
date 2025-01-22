@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 @NamedQueries({
-    
     @NamedQuery(
             name = "vfindAll",
             query = "SELECT v FROM Vehiculo v"
@@ -44,6 +43,10 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(
             name = "findBeforeDateRegistration",
             query = "SELECT v FROM Vehiculo v WHERE v.registrationDate <= :endDate"
+    ),
+    @NamedQuery(
+            name = "findAssignmentDetailsByVehicleId",
+            query = "SELECT e.fechaAsignacion, e.ruta.id FROM EnvioRutaVehiculo e WHERE e.vehiculo.id = :vehiculoId"
     )
 })
 
@@ -68,23 +71,22 @@ public class Vehiculo implements Serializable {
 
     @Column(name = "capacidad_carga", nullable = true)
     private Integer capacidadCarga;
-    
+
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "registrationDate", nullable = true)
     private Date registrationDate;
-    
+
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "itvDate", nullable = true)
     private Date itvDate;
 
     @Column(name = "activo", nullable = false)
-    private boolean activo; // Ejemplo: "Disponible", "En uso", "Mantenimiento"
+    private boolean activo;
 
     @OneToMany(mappedBy = "vehiculo", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<EnvioRutaVehiculo> envioRutaVehiculoList;
 
     // Getters y Setters
-
     public Integer getId() {
         return id;
     }
@@ -140,7 +142,6 @@ public class Vehiculo implements Serializable {
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
-   
 
     @XmlTransient
     public List<EnvioRutaVehiculo> getEnvioRutaVehiculoList() {

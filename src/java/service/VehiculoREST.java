@@ -20,6 +20,7 @@ import javax.swing.text.DateFormatter;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -33,7 +34,7 @@ import javax.ws.rs.core.MediaType;
  * @author 2dam
  */
 @Stateless
-@Path("entities.vehiculo")
+@Path("vehiculo")
 public class VehiculoREST extends AbstractFacade<Vehiculo> {
 
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
@@ -47,66 +48,102 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
     @Override
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void create(Vehiculo entity) throws CreateException {
-        super.create(entity);
+        try {
+            super.create(entity);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error creating vehicle: " + e.getMessage());
+        }
     }
 
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void edit(@PathParam("id") Integer id, Vehiculo entity) throws UpdateException {
-        super.edit(entity);
+        try {
+            super.edit(entity);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error updating vehicle: " + e.getMessage());
+        }
     }
 
     @DELETE
     @Path("{id}")
     public void remove(@PathParam("id") Integer id) throws SelectException, DeleteException {
-        super.remove(super.find(id));
+        try {
+            super.remove(super.find(id));
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error deleting vehicle: " + e.getMessage());
+        }
     }
 
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Vehiculo find(@PathParam("id") Integer id) throws SelectException {
-        return super.find(id);
+        try {
+            return super.find(id);
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error finding vehicle: " + e.getMessage());
+        }
     }
 
     @GET
     @Override
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Vehiculo> findAll() throws SelectException {
-        return super.findAll();
+        try {
+            return super.findAll();
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error retrieving vehicles: " + e.getMessage());
+        }
     }
 
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Vehiculo> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) throws SelectException {
-        return super.findRange(new int[]{from, to});
+        try {
+            return super.findRange(new int[]{from, to});
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error finding vehicle range: " + e.getMessage());
+        }
     }
 
     @GET
     @Path("count")
     @Produces(MediaType.TEXT_PLAIN)
     public String countREST() {
-        return String.valueOf(super.count());
+        try {
+            return String.valueOf(super.count());
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error counting vehicles: " + e.getMessage());
+        }
     }
 
     @GET
     @Path("capacity/{capacity}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Vehiculo> findByCapacity(@PathParam("capacity") Integer capacity) {
-        return em.createNamedQuery("findByCapacity", Vehiculo.class)
-                .setParameter("capacidadCarga", capacity)
-                .getResultList();
+        try {
+            return em.createNamedQuery("findByCapacity", Vehiculo.class)
+                    .setParameter("capacidadCarga", capacity)
+                    .getResultList();
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error finding vehicle by capacity: " + e.getMessage());
+        }
     }
 
     @GET
     @Path("plate/{matricula}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Vehiculo> findByPlate(@PathParam("matricula") String matricula) {
-        return em.createNamedQuery("findByPlate", Vehiculo.class)
-                .setParameter("matricula", "%" + matricula + "%")
-                .getResultList();
+        try {
+            return em.createNamedQuery("findByPlate", Vehiculo.class)
+                    .setParameter("matricula", "%" + matricula + "%")
+                    .getResultList();
+        } catch (Exception e) {
+           throw new InternalServerErrorException("Error finding vehicle by plate: " + e.getMessage());
+        }
     }
 
     @GET
@@ -114,32 +151,24 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Vehiculo> findByDateRange(@QueryParam("startDate") String startDate,
             @QueryParam("endDate") String endDate) throws SelectException {
-        if (startDate == null && endDate == null) {
-            return findAll();
-        }
+        try {
+            if (startDate == null && endDate == null) {
+                return findAll();
+            }
 
-        String queryStr = "SELECT v FROM Vehiculo v WHERE 1=1";
-        if (startDate != null) {
-            queryStr += " AND v.registrationDate >= :startDate";
-        }
-        if (endDate != null) {
-            queryStr += " AND v.registrationDate <= :endDate";
-        }
+            String queryStr = "SELECT v FROM Vehiculo v WHERE 1=1";
+            if (startDate != null) {
+                queryStr += " AND v.registrationDate >= :startDate";
+            }
+            if (endDate != null) {
+                queryStr += " AND v.registrationDate <= :endDate";
+            }
 
-        // Declaración explícita del tipo de variable
-        javax.persistence.TypedQuery<Vehiculo> query = em.createQuery(queryStr, Vehiculo.class);
-/*
-        DateFormatter formatter = DateFormatter.ofPattern("dd-MM-yyyy");
-        if (startDate != null) {
-            Date start = Date.parse(startDate, formatter);
-            query.setParameter("startDate", java.sql.Date.valueOf(start));
+            javax.persistence.TypedQuery<Vehiculo> query = em.createQuery(queryStr, Vehiculo.class);
+            return query.getResultList();
+        } catch (Exception e) {
+            throw new InternalServerErrorException("Error finding vehicles by date range: " + e.getMessage());
         }
-        if (endDate != null) {
-            Date end = Date.parse(endDate, formatter);
-            query.setParameter("endDate", java.sql.Date.valueOf(end));
-        }
-*/
-        return query.getResultList();
     }
 
     @Override
