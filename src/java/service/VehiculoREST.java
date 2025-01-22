@@ -13,6 +13,7 @@ import exception.UpdateException;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -31,7 +32,7 @@ import javax.ws.rs.core.MediaType;
 
 /**
  *
- * @author 2dam
+ * @author Adrian
  */
 @Stateless
 @Path("vehiculo")
@@ -45,13 +46,18 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
     }
 
     @POST
-    @Override
-    @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public void create(Vehiculo entity) throws CreateException {
+    @Consumes({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML})
+    public Vehiculo createVehicle(Vehiculo vehicle) {
         try {
-            super.create(entity);
-        } catch (Exception e) {
-            throw new InternalServerErrorException("Error creating vehicle: " + e.getMessage());
+            //LOGGER.log(Level.INFO, "Attempting to create vehicle with name: {0}", vehicle.getId());
+            vehicle.setId(null);
+            super.create(vehicle);
+            //LOGGER.log(Level.INFO, "Successfully created vehicle with ID: {0}", vehicle.getId());
+            return vehicle;
+        } catch (CreateException e) {
+            //LOGGER.log(Level.SEVERE, "Failed to create package", e);
+            throw new InternalServerErrorException("Failed to create package");
         }
     }
 
@@ -142,7 +148,7 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
                     .setParameter("matricula", "%" + matricula + "%")
                     .getResultList();
         } catch (Exception e) {
-           throw new InternalServerErrorException("Error finding vehicle by plate: " + e.getMessage());
+            throw new InternalServerErrorException("Error finding vehicle by plate: " + e.getMessage());
         }
     }
 
