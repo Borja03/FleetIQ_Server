@@ -14,6 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -38,6 +39,8 @@ import javax.ws.rs.core.MediaType;
 @Path("vehiculo")
 public class VehiculoREST extends AbstractFacade<Vehiculo> {
 
+    private static final Logger LOGGER = Logger.getLogger(VehiculoREST.class.getName());
+
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
     private EntityManager em;
 
@@ -50,13 +53,13 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
     @Produces({MediaType.APPLICATION_XML})
     public Vehiculo createVehicle(Vehiculo vehicle) {
         try {
-            //LOGGER.log(Level.INFO, "Attempting to create vehicle with name: {0}", vehicle.getId());
+            LOGGER.log(Level.INFO, "Attempting to create vehicle with name: {0}", vehicle.getId());
             vehicle.setId(null);
             super.create(vehicle);
-            //LOGGER.log(Level.INFO, "Successfully created vehicle with ID: {0}", vehicle.getId());
+            LOGGER.log(Level.INFO, "Successfully created vehicle with ID: {0}", vehicle.getId());
             return vehicle;
         } catch (CreateException e) {
-            //LOGGER.log(Level.SEVERE, "Failed to create package", e);
+            LOGGER.log(Level.SEVERE, "Failed to create package", e);
             throw new InternalServerErrorException("Failed to create package");
         }
     }

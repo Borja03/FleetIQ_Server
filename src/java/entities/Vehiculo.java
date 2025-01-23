@@ -66,7 +66,7 @@ public class Vehiculo implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
 
-    @Column(name = "matricula",  unique = true, length = 15)
+    @Column(name = "matricula", length = 15)
     private String matricula;
 
     @Column(name = "modelo", nullable = true, length = 50)
