@@ -41,20 +41,28 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
     @POST
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void create(EnvioRutaVehiculo entity) throws CreateException {
-        try  {
-            // Buscar la Ruta por su localizador
+        try {
+            System.out.println("Received EnvioRutaVehiculo: " + entity);
+            System.out.println("Ruta localizador: " + (entity.getRuta() != null ? entity.getRuta().getLocalizador() : "NULL"));
+
+            if (entity.getRuta() == null || entity.getRuta().getLocalizador() == null) {
+                throw new CreateException("Ruta or Ruta localizador is null");
+            }
+
+            // Attempt to find Ruta
             Ruta ruta = em.createNamedQuery("Ruta.findByLocalizadorInteger", Ruta.class)
                     .setParameter("localizador", entity.getRuta().getLocalizador())
                     .getSingleResult();
+
+            System.out.println("Found Ruta: " + ruta);
 
             // Set the Ruta in the EnvioRutaVehiculo entity
             entity.setRuta(ruta);
 
             // Persist the entity
             super.create(entity);
-
         } catch (Exception e) {
-            // Catch any errors and throw a custom exception
+            e.printStackTrace();
             throw new CreateException("Error al crear el EnvioRutaVehiculo: " + e.getMessage());
         }
     }
