@@ -7,8 +7,11 @@ import exception.CreateException;
 import exception.DeleteException;
 import exception.SelectException;
 import exception.UpdateException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -117,6 +120,24 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
                 .setParameter("rutaId", rutaId)
                 .getSingleResult();
         return String.valueOf(count);
+    }
+
+    @GET
+    @Path("/getId/{vehiculoId}")
+    @Produces(MediaType.APPLICATION_XML)
+    public List<EnvioRutaVehiculo> getId(@PathParam("vehiculoId") Integer vehiculoId) {
+        return em.createNamedQuery("EnvioRutaVehiculo.getId", EnvioRutaVehiculo.class)
+                .setParameter("vehiculoId", vehiculoId)
+                .getResultList();
+    }
+
+    @GET
+    @Path("/getRutaId/{vehiculoId}")
+    @Produces(MediaType.APPLICATION_XML)
+    public List<Ruta> getRutaId(@PathParam("vehiculoId") Integer vehiculoId) {
+        return em.createNamedQuery("EnvioRutaVehiculo.getRutaId", Ruta.class)
+                .setParameter("vehiculoId", vehiculoId)
+                .getResultList();
     }
 
     @Override

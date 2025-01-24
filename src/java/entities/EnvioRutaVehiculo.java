@@ -17,6 +17,17 @@ import javax.xml.bind.annotation.XmlTransient;
             name = "EnvioRutaVehiculo.findAll",
             query = "SELECT e FROM EnvioRutaVehiculo e"
     )
+    ,
+     @NamedQuery(
+            name = "EnvioRutaVehiculo.getId",
+            query = "SELECT e FROM EnvioRutaVehiculo e WHERE e.vehiculo.id = :vehiculoId"
+    )
+    ,
+
+    @NamedQuery(
+            name = "EnvioRutaVehiculo.getRutaId",
+            query = "SELECT r FROM EnvioRutaVehiculo e, Ruta r WHERE e.vehiculo.id = :vehiculoId AND e.ruta.id = r.id"
+    ),
 })
 
 /**
