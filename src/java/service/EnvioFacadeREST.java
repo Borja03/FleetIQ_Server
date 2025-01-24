@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response;
 
 /**
  *
- * @author Omar
+ * @author Alder
  */
 @Stateless
 @Path("envio")
