@@ -63,8 +63,24 @@ public class EnvioRutaVehiculo implements Serializable {
     public void setEnvios(List<Envio> envios) {
         this.envios = envios;
     }
+    
+      @Transient  
+    private Integer rutaLocalizador;  
+      
+        @Transient  
+    private Integer vehiculoID;  
 
-    @XmlTransient
+   
+
+    public Integer getVehiculoID() {
+        return vehiculoID;
+    }
+
+    public void setVehiculoID(Integer vehiculoID) {
+        this.vehiculoID = vehiculoID;
+    }
+
+   @XmlTransient
     public Ruta getRuta() {
         return ruta;
     }
@@ -89,10 +105,19 @@ public class EnvioRutaVehiculo implements Serializable {
     public void setFechaAsignacion(Date fechaAsignacion) {
         this.fechaAsignacion = fechaAsignacion;
     }
-
-    @Override
-    public String toString() {
-        return "EnvioRutaVehiculo{" + "id=" + id + ", envios=" + envios + ", ruta=" + ruta + ", vehiculo=" + vehiculo + ", fechaAsignacion=" + fechaAsignacion + '}';
-
+    
+     public Integer getRutaLocalizador() {
+        return rutaLocalizador;
     }
+
+    public void setRutaLocalizador(Integer rutaLocalizador) {
+        this.rutaLocalizador = rutaLocalizador;
+    }
+    
+     @Override
+    public String toString() {
+        return "EnvioRutaVehiculo{" + "id=" + id + ", envios=" + envios + ", ruta=" + ruta + ", vehiculo=" + vehiculo + ", fechaAsignacion=" + fechaAsignacion + ", rutaLocalizador=" + rutaLocalizador + ", vehiculoID=" + vehiculoID + '}';
+    }
+
+   
 }
