@@ -158,32 +158,6 @@ public class VehiculoREST extends AbstractFacade<Vehiculo> {
             throw new InternalServerErrorException("Error finding vehicle by plate: " + e.getMessage());
         }
     }
-/*
-    @GET
-    @Path("dates")
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Vehiculo> findByDateRange(@QueryParam("startDate") String startDate,
-            @QueryParam("endDate") String endDate) throws SelectException {
-        try {
-            if (startDate == null && endDate == null) {
-                return findAll();
-            }
-
-            String queryStr = "SELECT v FROM Vehiculo v WHERE 1=1";
-            if (startDate != null) {
-                queryStr += " AND v.registrationDate >= :startDate";
-            }
-            if (endDate != null) {
-                queryStr += " AND v.registrationDate <= :endDate";
-            }
-
-            javax.persistence.TypedQuery<Vehiculo> query = em.createQuery(queryStr, Vehiculo.class);
-            return query.getResultList();
-        } catch (Exception e) {
-            throw new InternalServerErrorException("Error finding vehicles by date range: " + e.getMessage());
-        }
-    }
-*/
     @GET
     @Path("date/betweenRegistration")
     @Produces({MediaType.APPLICATION_XML})
