@@ -1,5 +1,6 @@
 package service;
 
+import static com.sun.xml.internal.ws.spi.db.BindingContextFactory.LOGGER;
 import entities.EnvioRutaVehiculo;
 import entities.Ruta;
 import entities.Vehiculo;
@@ -45,33 +46,20 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public void create(EnvioRutaVehiculo entity) throws CreateException {
         try {
-            System.out.println("Received EnvioRutaVehiculo: " + entity);
-            System.out.println("Ruta localizador: " + entity.getRutaLocalizador());
-            System.out.println("Vehiculo ID: " + entity.getVehiculoID());
-
-            // Validar que ambos IDs estén presentes
-            if (entity.getRutaLocalizador() == null) {
-                throw new CreateException("Ruta localizador is null");
-            }
-            if (entity.getVehiculoID() == null) {
-                throw new CreateException("Vehiculo ID is null");
-            }
+            LOGGER.info("Received EnvioRutaVehiculo: " + entity);
+            LOGGER.info("Ruta localizador: " + entity.getRutaLocalizador());
+            LOGGER.info("Vehiculo ID: " + entity.getVehiculoID());
 
             // Buscar la Ruta usando el localizador
             Ruta ruta = em.createNamedQuery("Ruta.findByLocalizadorInteger", Ruta.class)
                     .setParameter("localizador", entity.getRutaLocalizador())
                     .getSingleResult();
-            System.out.println("Found Ruta: " + ruta);
+            LOGGER.info("Found Ruta: " + ruta);
 
             // Buscar el Vehículo usando su ID mediante una query
             Vehiculo vehiculo = em.createQuery("SELECT v FROM Vehiculo v WHERE v.id = :id", Vehiculo.class)
                     .setParameter("id", entity.getVehiculoID())
                     .getSingleResult();
-
-            if (vehiculo == null) {
-                throw new CreateException("No se encontró el vehículo con ID: " + entity.getVehiculoID());
-            }
-            System.out.println("Found Vehiculo: " + vehiculo.getId() + " - " + vehiculo.getMatricula());
 
             // Crear una nueva instancia manejada por JPA
             EnvioRutaVehiculo newEntity = new EnvioRutaVehiculo();
@@ -80,10 +68,10 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
             newEntity.setFechaAsignacion(entity.getFechaAsignacion());
 
             // Verificar que los valores se han establecido correctamente
-            System.out.println("Verificación antes de persistir:");
-            System.out.println("Ruta: " + newEntity.getRuta().getLocalizador());
-            System.out.println("Vehiculo: " + newEntity.getVehiculo().getId());
-            System.out.println("Fecha: " + newEntity.getFechaAsignacion());
+            LOGGER.info("Verificación antes de persistir:");
+            LOGGER.info("Ruta: " + newEntity.getRuta().getLocalizador());
+            LOGGER.info("Vehiculo: " + newEntity.getVehiculo().getId());
+            LOGGER.info("Fecha: " + newEntity.getFechaAsignacion());
 
             // Persistir la nueva entidad
             em.persist(newEntity);
