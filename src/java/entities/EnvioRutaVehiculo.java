@@ -46,11 +46,11 @@ public class EnvioRutaVehiculo implements Serializable {
     private List<Envio> envios;
     
 @ManyToOne(fetch = FetchType.EAGER)  // Removido cascade = CascadeType.ALL
-@JoinColumn(name = "ruta_id", nullable = false)
+@JoinColumn(name = "ruta_id", nullable = true)
 private Ruta ruta;
 
 @ManyToOne(fetch = FetchType.EAGER)  // Removido cascade = CascadeType.ALL
-@JoinColumn(name = "vehiculo_id", nullable = false)
+@JoinColumn(name = "vehiculo_id", nullable = true)
 private Vehiculo vehiculo;
 
     @Temporal(TemporalType.TIMESTAMP)

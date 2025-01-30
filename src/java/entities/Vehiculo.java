@@ -1,5 +1,7 @@
 package entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -74,6 +76,11 @@ public class Vehiculo implements Serializable {
 
     @Column(name = "capacidad_carga", nullable = true)
     private Integer capacidadCarga;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonSerialize(as = Date.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
+    private Date beginBalanceTimestamp;
 
     @Temporal(javax.persistence.TemporalType.DATE)
     @Column(name = "registrationDate", nullable = true)
