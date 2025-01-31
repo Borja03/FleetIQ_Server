@@ -34,7 +34,7 @@ import javax.ws.rs.core.Response;
 
 /**
  *
- * @author Omar
+ * @author Alder
  */
 @Stateless
 @Path("envio")
@@ -142,10 +142,6 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
     @Path("filterNumPaquetes")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Envio> filterNumPaquetes(@QueryParam("numPaquetes") Integer numPaquetes) throws SelectException {
-        if (numPaquetes == null) {
-            throw new SelectException("El número de paquetes no puede ser null.");
-        }
-
         try {
             Query query = em.createNamedQuery("Envio.filterNumPaquetes");
             query.setParameter("numPaquetes", numPaquetes);
@@ -195,14 +191,17 @@ public class EnvioFacadeREST extends AbstractFacade<Envio> {
         try {
             Envio envio = super.find(id);
 
-            if (envio == null) {
-                throw new NotFoundException("Envio con ID " + id + " no encontrado.");
+            if (envio.getEnvioRutaVehiculo() != null) {
+                envio.setEnvioRutaVehiculo(null);
+                super.edit(envio);
             }
             Logger.getLogger(EnvioFacadeREST.class.getName()).log(Level.WARNING, envio.toString());
             super.remove(envio);
             Logger.getLogger(EnvioFacadeREST.class.getName()).log(Level.INFO, "Envio eliminado exitosamente: " + envio.toString());
         } catch (SelectException | DeleteException ex) {
             throw new InternalServerErrorException("Error removing Envio entity.", ex);
+        } catch (UpdateException ex) {
+            Logger.getLogger(EnvioFacadeREST.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

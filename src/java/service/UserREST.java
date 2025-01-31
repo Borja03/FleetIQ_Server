@@ -238,7 +238,32 @@ public class UserREST extends AbstractFacade<User> {
             throw new InternalServerErrorException("Error verifying code.");
         }
     }
+    
+    @POST
+    @Path("verify-code")
+    @Consumes({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML})
+    public User verifyCode(User user) {
+        try {
+            User dbUser = em.createNamedQuery("findUserByEmail", User.class)
+                            .setParameter("userEmail", user.getEmail())
+                            .getSingleResult();
 
+            if (dbUser.getVerifcationCode().equals(user.getVerifcationCode())) {
+                dbUser.setVerifcationCode("");
+                //here to add hash 
+                em.merge(dbUser);  // Save the changes
+                user.setActivo(true);
+                return user;
+            }
+            System.out.println("Codes don't match, returning false");
+            return user;
+        } catch (Exception e) {
+            System.out.println("Exception caught: " + e.getMessage());
+            e.printStackTrace();
+            return user;
+        }
+    }
     @PUT
     @Path("update-password")
     @Consumes({MediaType.APPLICATION_XML})

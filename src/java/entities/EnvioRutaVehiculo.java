@@ -17,6 +17,17 @@ import javax.xml.bind.annotation.XmlTransient;
             name = "EnvioRutaVehiculo.findAll",
             query = "SELECT e FROM EnvioRutaVehiculo e"
     )
+    ,
+     @NamedQuery(
+            name = "EnvioRutaVehiculo.getId",
+            query = "SELECT e FROM EnvioRutaVehiculo e WHERE e.vehiculo.id = :vehiculoId"
+    )
+    ,
+
+    @NamedQuery(
+            name = "EnvioRutaVehiculo.getRutaId",
+            query = "SELECT r FROM EnvioRutaVehiculo e, Ruta r WHERE e.vehiculo.id = :vehiculoId AND e.ruta.id = r.id"
+    ),
 })
 
 /**
@@ -33,14 +44,14 @@ public class EnvioRutaVehiculo implements Serializable {
 
     @OneToMany(mappedBy = "envioRutaVehiculo", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Envio> envios;
+    
+@ManyToOne(fetch = FetchType.EAGER)  // Removido cascade = CascadeType.ALL
+@JoinColumn(name = "ruta_id", nullable = false)
+private Ruta ruta;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "ruta_id", nullable = false)
-    private Ruta ruta;
-
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "vehiculo_id", nullable = false)
-    private Vehiculo vehiculo;
+@ManyToOne(fetch = FetchType.EAGER)  // Removido cascade = CascadeType.ALL
+@JoinColumn(name = "vehiculo_id", nullable = false)
+private Vehiculo vehiculo;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "fecha_asignacion", nullable = false)
@@ -63,8 +74,24 @@ public class EnvioRutaVehiculo implements Serializable {
     public void setEnvios(List<Envio> envios) {
         this.envios = envios;
     }
+    
+      @Transient  
+    private Integer rutaLocalizador;  
+      
+        @Transient  
+    private Integer vehiculoID;  
 
-    @XmlTransient
+   
+
+    public Integer getVehiculoID() {
+        return vehiculoID;
+    }
+
+    public void setVehiculoID(Integer vehiculoID) {
+        this.vehiculoID = vehiculoID;
+    }
+
+   @XmlTransient
     public Ruta getRuta() {
         return ruta;
     }
@@ -89,10 +116,19 @@ public class EnvioRutaVehiculo implements Serializable {
     public void setFechaAsignacion(Date fechaAsignacion) {
         this.fechaAsignacion = fechaAsignacion;
     }
-
-    @Override
-    public String toString() {
-        return "EnvioRutaVehiculo{" + "id=" + id + ", envios=" + envios + ", ruta=" + ruta + ", vehiculo=" + vehiculo + ", fechaAsignacion=" + fechaAsignacion + '}';
-
+    
+     public Integer getRutaLocalizador() {
+        return rutaLocalizador;
     }
+
+    public void setRutaLocalizador(Integer rutaLocalizador) {
+        this.rutaLocalizador = rutaLocalizador;
+    }
+    
+     @Override
+    public String toString() {
+        return "EnvioRutaVehiculo{" + "id=" + id + ", envios=" + envios + ", ruta=" + ruta + ", vehiculo=" + vehiculo + ", fechaAsignacion=" + fechaAsignacion + ", rutaLocalizador=" + rutaLocalizador + ", vehiculoID=" + vehiculoID + '}';
+    }
+
+   
 }
