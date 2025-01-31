@@ -5,6 +5,8 @@
  */
 package entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.io.Serializable;
 import java.util.Date;
 import static javax.persistence.CascadeType.ALL;
@@ -28,35 +30,37 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author Omar
  */
-
-
 @NamedQueries({
     @NamedQuery(
-        name = "findAll",
-        query = "SELECT p FROM Paquete p"
-    ),
+                    name = "findAll",
+                    query = "SELECT p FROM Paquete p"
+    )
+    ,
     @NamedQuery(
-        name = "findBySize",
-        query = "SELECT p FROM Paquete p WHERE p.size = :size"
-    ),
+                    name = "findBySize",
+                    query = "SELECT p FROM Paquete p WHERE p.size = :size"
+    )
+    ,
     @NamedQuery(
-        name = "findByDateRange",
-        query = "SELECT p FROM Paquete p WHERE p.creationDate BETWEEN :startDate AND :endDate"
-    ),
+                    name = "findByDateRange",
+                    query = "SELECT p FROM Paquete p WHERE p.creationDate BETWEEN :startDate AND :endDate"
+    )
+    ,
     @NamedQuery(
-        name = "findByName",
-        query = "SELECT p FROM Paquete p WHERE LOWER(p.sender) LIKE LOWER(:name) OR LOWER(p.receiver) LIKE LOWER(:name)"
-    ),
+                    name = "findByName",
+                    query = "SELECT p FROM Paquete p WHERE LOWER(p.sender) LIKE LOWER(:name) OR LOWER(p.receiver) LIKE LOWER(:name)"
+    )
+    ,
     @NamedQuery(
-        name = "findAfterDate",
-        query = "SELECT p FROM Paquete p WHERE p.creationDate >= :startDate"
-    ),
+                    name = "findAfterDate",
+                    query = "SELECT p FROM Paquete p WHERE p.creationDate >= :startDate"
+    )
+    ,
     @NamedQuery(
-        name = "findBeforeDate",
-        query = "SELECT p FROM Paquete p WHERE p.creationDate <= :endDate"
+                    name = "findBeforeDate",
+                    query = "SELECT p FROM Paquete p WHERE p.creationDate <= :endDate"
     )
 })
-
 
 @Entity
 @Table(schema = "FleetIQ", name = "package")
@@ -72,7 +76,10 @@ public class Paquete implements Serializable {
     private double weight;
     @Enumerated(EnumType.STRING)
     private PackageSize size;
+
     @Temporal(TemporalType.DATE)
+    @JsonSerialize(as = Date.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private Date creationDate;
     private boolean fragile;
 
@@ -90,8 +97,6 @@ public class Paquete implements Serializable {
     public void setEnvio(Envio envio) {
         this.envio = envio;
     }
-    
-    
 
     public Long getId() {
         return id;
@@ -160,13 +165,13 @@ public class Paquete implements Serializable {
     @Override
     public String toString() {
         return "PaqueteEntity{"
-                + "id=" + id
-                + ", sender='" + sender + '\''
-                + ", receiver='" + receiver + '\''
-                + ", weight=" + weight
-                + ", size=" + size
-                + ", creationDate=" + creationDate
-                + ", fragile=" + fragile
-                + '}';
+                        + "id=" + id
+                        + ", sender='" + sender + '\''
+                        + ", receiver='" + receiver + '\''
+                        + ", weight=" + weight
+                        + ", size=" + size
+                        + ", creationDate=" + creationDate
+                        + ", fragile=" + fragile
+                        + '}';
     }
 }

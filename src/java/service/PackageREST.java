@@ -6,10 +6,10 @@ import exception.CreateException;
 import exception.DeleteException;
 import exception.SelectException;
 import exception.UpdateException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Stateless;
@@ -18,6 +18,13 @@ import javax.persistence.PersistenceContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+/**
+ *
+ * @author Omar
+ */
+/**
+ *
+ */
 @Stateless
 @Path("paquete")
 public class PackageREST extends AbstractFacade<Paquete> {
@@ -33,14 +40,14 @@ public class PackageREST extends AbstractFacade<Paquete> {
 
     @POST
     @Consumes({MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
     public Paquete createPackage(Paquete paquete) {
         try {
             LOGGER.log(Level.INFO, "Attempting to create package with name: {0}", paquete.getId());
             super.create(paquete);
             LOGGER.log(Level.INFO, "Successfully created package with ID: {0}", paquete.getId());
             return paquete;
-        } catch (CreateException e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to create package", e);
             throw new InternalServerErrorException("Failed to create package");
         }
@@ -49,23 +56,25 @@ public class PackageREST extends AbstractFacade<Paquete> {
     @PUT
     @Path("{id}")
     @Consumes({MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Paquete updatePackage(@PathParam("id") Long id, Paquete paquete) {
         try {
             LOGGER.log(Level.INFO, "Attempting to update package with ID: {0}", id);
-            Paquete existingPackage = super.find(paquete.getId());
-            if (existingPackage == null) {
-                LOGGER.log(Level.WARNING, "Package not found with ID: {0}", id);
+
+            // Check if entity exists and is in persistence context
+            if (!getEntityManager().contains(find(id))) {
+                LOGGER.log(Level.WARNING, "Package with ID {0} is not in persistence context", id);
+                throw new NotFoundException("Package not found or no longer in persistence context: " + id);
             }
+
+            paquete.setId(id);
             super.edit(paquete);
+
             LOGGER.log(Level.INFO, "Successfully updated package with ID: {0}", id);
             return paquete;
-        } catch (SelectException | UpdateException e) {
-            LOGGER.log(Level.SEVERE, "Failed to update package with ID: " + id, e);
-            throw new InternalServerErrorException("Failed to update package");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to update package with ID: " + id, e);
-            throw new InternalServerErrorException("Failed to update package");
+            throw new InternalServerErrorException("Failed to update package" +e.getMessage());
         }
     }
 
@@ -77,12 +86,10 @@ public class PackageREST extends AbstractFacade<Paquete> {
             Paquete packageToDelete = super.find(id);
             if (packageToDelete == null) {
                 LOGGER.log(Level.WARNING, "Package not found for deletion with ID: {0}", id);
+                throw new NotFoundException("Package not found with ID: " + id);
             }
             super.remove(packageToDelete);
             LOGGER.log(Level.INFO, "Successfully deleted package with ID: {0}", id);
-        } catch (SelectException | DeleteException e) {
-            LOGGER.log(Level.SEVERE, "Failed to delete package with ID: " + id, e);
-            throw new InternalServerErrorException("Failed to delete package");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to delete package with ID: " + id, e);
             throw new InternalServerErrorException("Failed to delete package");
@@ -90,16 +97,13 @@ public class PackageREST extends AbstractFacade<Paquete> {
     }
 
     @GET
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Paquete> findAllPackages() {
         try {
             LOGGER.log(Level.INFO, "Fetching all packages");
             List<Paquete> packages = super.findAll();
             LOGGER.log(Level.INFO, "Retrieved {0} packages", packages.size());
             return packages;
-        } catch (SelectException e) {
-            LOGGER.log(Level.SEVERE, "Failed to fetch all packages", e);
-            throw new InternalServerErrorException("Failed to fetch packages");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to fetch all packages", e);
             throw new InternalServerErrorException("Failed to fetch packages");
@@ -108,7 +112,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
 
     @GET
     @Path("size/{size}")
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
     public List<Paquete> findPackagesBySize(@PathParam("size") PackageSize size) {
         try {
             LOGGER.log(Level.INFO, "Searching packages by size: {0}", size);
@@ -125,15 +129,14 @@ public class PackageREST extends AbstractFacade<Paquete> {
 
     @GET
     @Path("name/{name}")
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
     public List<Paquete> findPackagesByName(@PathParam("name") String name) {
         try {
             LOGGER.log(Level.INFO, "Searching packages by name: {0}", name);
             List<Paquete> packages = em.createNamedQuery("findByName", Paquete.class)
                             .setParameter("name", "%" + name + "%")
                             .getResultList();
-            LOGGER.log(Level.INFO, "Found {0} packages matching name: {1}",
-                            new Object[]{packages.size(), name});
+            LOGGER.log(Level.INFO, "Found {0} packages matching name: {1}", new Object[]{packages.size(), name});
             return packages;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to fetch packages by name: " + name, e);
@@ -143,7 +146,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
 
     @GET
     @Path("date/between")
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
     public List<Paquete> findPackagesBetweenDates(
                     @QueryParam("startDate") @DefaultValue("") String startDate,
                     @QueryParam("endDate") @DefaultValue("") String endDate) {
@@ -151,10 +154,10 @@ public class PackageREST extends AbstractFacade<Paquete> {
             LOGGER.log(Level.INFO, "Fetching packages between {0} and {1}", new Object[]{startDate, endDate});
 
             if (startDate.isEmpty() || endDate.isEmpty()) {
-                throw new InternalServerErrorException("Both startDate and endDate must be provided");
+                throw new BadRequestException("Both startDate and endDate must be provided");
             }
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             Date start = dateFormat.parse(startDate);
             Date end = dateFormat.parse(endDate);
 
@@ -168,23 +171,23 @@ public class PackageREST extends AbstractFacade<Paquete> {
                             .getResultList();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to parse date parameters", e);
-            throw new InternalServerErrorException("Invalid date format. Expected yyyy-MM-dd.");
+            throw new InternalServerErrorException("Invalid date format. Expected dd-MM-yyyy.");
         }
     }
 
     @GET
     @Path("date/after")
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
     public List<Paquete> findPackagesAfterDate(
                     @QueryParam("startDate") @DefaultValue("") String startDate) {
         try {
             LOGGER.log(Level.INFO, "Fetching packages after {0}", startDate);
 
             if (startDate.isEmpty()) {
-                throw new InternalServerErrorException("startDate must be provided");
+                throw new BadRequestException("startDate must be provided");
             }
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             Date start = dateFormat.parse(startDate);
 
             return em.createNamedQuery("findAfterDate", Paquete.class)
@@ -192,23 +195,23 @@ public class PackageREST extends AbstractFacade<Paquete> {
                             .getResultList();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to parse startDate parameter", e);
-            throw new InternalServerErrorException("Invalid date format. Expected yyyy-MM-dd.");
+            throw new InternalServerErrorException("Invalid date format. Expected dd-MM-yyyy.");
         }
     }
 
     @GET
     @Path("date/before")
-    @Produces({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
     public List<Paquete> findPackagesBeforeDate(
                     @QueryParam("endDate") @DefaultValue("") String endDate) {
         try {
             LOGGER.log(Level.INFO, "Fetching packages before {0}", endDate);
 
             if (endDate.isEmpty()) {
-                throw new InternalServerErrorException("endDate must be provided");
+                throw new BadRequestException("endDate must be provided");
             }
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
             Date end = dateFormat.parse(endDate);
 
             return em.createNamedQuery("findBeforeDate", Paquete.class)
@@ -216,7 +219,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
                             .getResultList();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to parse endDate parameter", e);
-            throw new InternalServerErrorException("Invalid date format. Expected yyyy-MM-dd.");
+            throw new InternalServerErrorException("Invalid date format. Expected dd-MM-yyyy.");
         }
     }
 

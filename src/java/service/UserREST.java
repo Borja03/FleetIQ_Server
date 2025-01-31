@@ -1,11 +1,13 @@
 package service;
 
 import encryption.HashMD5;
+import encryption.ServerSideDecryption;
 import encryption.SymmetricDecrypt;
 import entities.Admin;
 import entities.Trabajador;
 import entities.User;
 import exception.*;
+import java.util.Base64;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -15,14 +17,9 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import utils.EmailSender;
 import utils.Utils;
 
-/**
- *
- * @author Omar
- */
 /**
  * REST service for User entity management.
  */
@@ -31,10 +28,11 @@ import utils.Utils;
 public class UserREST extends AbstractFacade<User> {
 
     private static final Logger LOGGER = Logger.getLogger(UserREST.class.getName());
+
     @PersistenceContext(unitName = "FleetIQ_ServerPU")
     private EntityManager em;
 
-    SymmetricDecrypt symmetricDecrypt = new SymmetricDecrypt();
+    private final SymmetricDecrypt symmetricDecrypt = new SymmetricDecrypt();
 
     public UserREST() {
         super(User.class);
@@ -56,25 +54,35 @@ public class UserREST extends AbstractFacade<User> {
     @POST
     @Path("signup")
     @Consumes({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML})
     public User signUp(User entity) {
+        String decryptedPassword = null;
         try {
-            LOGGER.log(Level.INFO, "User signup initiated for email: {0}", entity.getEmail());
-            // Check if user already exists by email
-            try {
-                User existingUser = em.createNamedQuery("findUserByEmail", User.class)
-                                .setParameter("userEmail", entity.getEmail())
-                                .getSingleResult();
-                if (existingUser != null) {
-                    LOGGER.log(Level.WARNING, "User already exists with email: {0}", entity.getEmail());
-                    throw new NotAuthorizedException("User already exists with this email.");
+            LOGGER.log(Level.INFO, "User login attempt: {0}", entity.getEmail());
+            String encryptedBase64 = entity.getPassword();
+            if (encryptedBase64 == null || encryptedBase64.isEmpty()) {
+                LOGGER.log(Level.SEVERE, "Encrypted Base64 string is empty");
+            } else {
+                try {
+                    byte[] encryptedData = Base64.getDecoder().decode(encryptedBase64);
+                    // Call ServerSideDecryption to decrypt the message
+                    decryptedPassword = ServerSideDecryption.decrypt(encryptedData);
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Decryption failed", e);
                 }
-            } catch (NoResultException ex) {
-                LOGGER.log(Level.INFO, "No existing user found with email: {0}", entity.getEmail());
             }
-            // Hash the password
-            entity.setPassword(HashMD5.hashText(entity.getPassword()));
+            LOGGER.log(Level.INFO, "User signup initiated for email: {0}", entity.getEmail());
 
-            // Determine user type and create corresponding entity
+            // Check if user already exists by email
+            List<User> existingUsers = em.createNamedQuery("findUserByEmail", User.class)
+                            .setParameter("userEmail", entity.getEmail())
+                            .getResultList();
+            if (!existingUsers.isEmpty()) {
+                LOGGER.log(Level.WARNING, "User already exists with email: {0}", entity.getEmail());
+                throw new NotAuthorizedException("User already exists with this email.");
+            }
+
+            // Validate user type and create entity accordingly
             User newUser;
             if ("admin".equals(entity.getUser_type())) {
                 newUser = new Admin();
@@ -88,8 +96,9 @@ public class UserREST extends AbstractFacade<User> {
                 }
             } else {
                 LOGGER.severe("Invalid user type");
-                throw new InternalServerErrorException("Invalid user type provided.");
+                throw new BadRequestException("Unsupported user type.");
             }
+
             // Set common properties
             newUser.setId(entity.getId());
             newUser.setName(entity.getName());
@@ -102,13 +111,20 @@ public class UserREST extends AbstractFacade<User> {
             newUser.setEnviosList(entity.getEnviosList());
             newUser.setUser_type(entity.getUser_type());
 
-            // Save the new user
-            super.create(newUser);
+            newUser.setPassword(HashMD5.hashText(decryptedPassword));
 
+            // Persist the user
+            super.create(newUser);
+            em.detach(newUser);
+
+            newUser.setPassword(null);
             return newUser;
-        } catch ( Exception ex) {
-            LOGGER.log(Level.SEVERE, "Error during signup: {0}", ex.getMessage());
-            throw new InternalServerErrorException("Signup failed: " + ex.getMessage());
+        } catch (NotAuthorizedException ex) {
+            LOGGER.log(Level.WARNING, "Signup authorization issue: {0}", ex.getMessage());
+            throw ex;
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Error during signup", ex);
+            throw new InternalServerErrorException("Signup failed. Please try again later." + ex.getMessage());
         }
     }
 
@@ -117,12 +133,29 @@ public class UserREST extends AbstractFacade<User> {
     @Consumes({MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_XML})
     public User signIn(User user) {
+        String decryptedPassword = null;
         try {
+
             LOGGER.log(Level.INFO, "User login attempt: {0}", user.getEmail());
+            String encryptedBase64 = user.getPassword();
+
+            if (encryptedBase64 == null || encryptedBase64.isEmpty()) {
+                LOGGER.log(Level.SEVERE, "Encrypted Base64 string is empty");
+            } else {
+                try {
+                    byte[] encryptedData = Base64.getDecoder().decode(encryptedBase64);
+
+                    // Call ServerSideDecryption to decrypt the message
+                    decryptedPassword = ServerSideDecryption.decrypt(encryptedData);
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Decryption failed", e);
+                }
+            }
             User loggedInUser = em.createNamedQuery("signin", User.class)
                             .setParameter("userEmail", user.getEmail())
-                            .setParameter("userPassword", HashMD5.hashText(user.getPassword()))
+                            .setParameter("userPassword", HashMD5.hashText(decryptedPassword))
                             .getSingleResult();
+
             em.detach(loggedInUser);
             loggedInUser.setPassword(null);
             return loggedInUser;
@@ -133,6 +166,7 @@ public class UserREST extends AbstractFacade<User> {
             LOGGER.log(Level.SEVERE, "Login failed: {0}", ex.getMessage());
             throw new InternalServerErrorException("Login failed: " + ex.getMessage());
         }
+
     }
 
     @POST
@@ -173,14 +207,35 @@ public class UserREST extends AbstractFacade<User> {
                 String[] credentials = symmetricDecrypt.descifrarCredenciales();
                 EmailSender.sendEmail(credentials[0], credentials[1], user.getEmail(), resetCode, "rest");
                 existingUser.setVerifcationCode(resetCode);
-                //em.merge(existingUser);
                 super.edit(existingUser);
             }
-        } catch (UpdateException ex) {
-            LOGGER.log(Level.SEVERE, "Error during password reset: {0}", ex.getMessage());
-            throw new InternalServerErrorException("Password reset failed.");
         } catch (Exception ex) {
-            Logger.getLogger(UserREST.class.getName()).log(Level.SEVERE, null, ex);
+            LOGGER.log(Level.SEVERE, "Error during password reset", ex);
+            throw new InternalServerErrorException("Password reset failed.");
+        }
+    }
+
+    @POST
+    @Path("verify-code")
+    @Consumes({MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_XML})
+    public User verifyCode(User user) {
+        try {
+            User dbUser = em.createNamedQuery("findUserByEmail", User.class)
+                            .setParameter("userEmail", user.getEmail())
+                            .getSingleResult();
+
+            if (dbUser.getVerifcationCode().equals(user.getVerifcationCode())) {
+                dbUser.setVerifcationCode("");
+                super.edit(dbUser);
+                user.setActivo(true);
+                return user;
+            }
+            LOGGER.log(Level.WARNING, "Verification codes do not match for email: {0}", user.getEmail());
+            return user;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error verifying code: {0}", e.getMessage());
+            throw new InternalServerErrorException("Error verifying code.");
         }
     }
 
@@ -188,26 +243,30 @@ public class UserREST extends AbstractFacade<User> {
     @Path("update-password")
     @Consumes({MediaType.APPLICATION_XML})
     public void updatePassword(User user) {
+        String decryptedPass = null;
         try {
             LOGGER.log(Level.INFO, "Updating password for email: {0}", user.getEmail());
             User existingUser = em.createNamedQuery("findUserByEmail", User.class)
                             .setParameter("userEmail", user.getEmail())
                             .getSingleResult();
             if (existingUser != null) {
-                existingUser.setPassword(HashMD5.hashText(user.getPassword()));
+                String encryptedBase64 = user.getPassword();
+                try {
+                    byte[] encryptedData = Base64.getDecoder().decode(encryptedBase64);
+                    decryptedPass = ServerSideDecryption.decrypt(encryptedData);
+                    System.out.println("Decrypted Message: " + decryptedPass);
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Decryption failed", e);
+                }
+                existingUser.setPassword(HashMD5.hashText(decryptedPass));
                 super.edit(existingUser);
-                //em.merge(existingUser);
 
                 String[] credentials = symmetricDecrypt.descifrarCredenciales();
                 EmailSender.sendEmail(credentials[0], credentials[1], user.getEmail(), "", "changed");
             }
-        } catch (UpdateException ex) {
+        } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Error updating password: {0}", ex.getMessage());
             throw new InternalServerErrorException("Password update failed.");
-        } catch (Exception ex) {
-            Logger.getLogger(UserREST.class.getName()).log(Level.SEVERE, null, ex);
-            throw new InternalServerErrorException("Password update failed.");
-
         }
     }
 
