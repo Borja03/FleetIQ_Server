@@ -62,7 +62,6 @@ public class EnvioRutaVehiculoFacadeREST extends AbstractFacade<EnvioRutaVehicul
             newEntity.setRuta(ruta);
             newEntity.setVehiculo(vehiculo);
             newEntity.setFechaAsignacion(entity.getFechaAsignacion());
-            
             // Persistir la nueva entidad
             em.persist(newEntity);
             em.flush();
