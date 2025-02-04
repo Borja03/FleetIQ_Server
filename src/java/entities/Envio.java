@@ -82,7 +82,7 @@ public class Envio implements Serializable {
     @ManyToMany(mappedBy = "enviosList")
     private List<User> userList;
 
-    @OneToMany(cascade = ALL, mappedBy = "envio", fetch = EAGER, orphanRemoval = true)
+    @OneToMany(cascade = ALL, mappedBy = "envio", fetch = EAGER)
     private List<Paquete> packageList;
 
     // Métodos de acceso (getters y setters) de los campos transitorios
