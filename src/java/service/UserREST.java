@@ -59,20 +59,8 @@ public class UserREST extends AbstractFacade<User> {
         String decryptedPassword = null;
         try {
             LOGGER.log(Level.INFO, "User login attempt: {0}", entity.getEmail());
-            String encryptedBase64 = entity.getPassword();
-            if (encryptedBase64 == null || encryptedBase64.isEmpty()) {
-                LOGGER.log(Level.SEVERE, "Encrypted Base64 string is empty");
-            } else {
-                try {
-                    byte[] encryptedData = Base64.getDecoder().decode(encryptedBase64);
-                    // Call ServerSideDecryption to decrypt the message
-                    decryptedPassword = ServerSideDecryption.decrypt(encryptedData);
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Decryption failed", e);
-                }
-            }
+            decryptedPassword = ServerSideDecryption.decrypt(entity.getPassword());
             LOGGER.log(Level.INFO, "User signup initiated for email: {0}", entity.getEmail());
-
             // Check if user already exists by email
             List<User> existingUsers = em.createNamedQuery("findUserByEmail", User.class)
                             .setParameter("userEmail", entity.getEmail())
@@ -137,20 +125,9 @@ public class UserREST extends AbstractFacade<User> {
         try {
 
             LOGGER.log(Level.INFO, "User login attempt: {0}", user.getEmail());
-            String encryptedBase64 = user.getPassword();
-
-            if (encryptedBase64 == null || encryptedBase64.isEmpty()) {
-                LOGGER.log(Level.SEVERE, "Encrypted Base64 string is empty");
-            } else {
-                try {
-                    byte[] encryptedData = Base64.getDecoder().decode(encryptedBase64);
-
-                    // Call ServerSideDecryption to decrypt the message
-                    decryptedPassword = ServerSideDecryption.decrypt(encryptedData);
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Decryption failed", e);
-                }
-            }
+            LOGGER.log(Level.INFO, "Password before decrypting : {0}", user.getPassword());
+            decryptedPassword = ServerSideDecryption.decrypt(user.getPassword());
+            LOGGER.log(Level.INFO, "Password after decrypting : {0}", decryptedPassword);
             User loggedInUser = em.createNamedQuery("signin", User.class)
                             .setParameter("userEmail", user.getEmail())
                             .setParameter("userPassword", HashMD5.hashText(decryptedPassword))
@@ -224,8 +201,11 @@ public class UserREST extends AbstractFacade<User> {
             User dbUser = em.createNamedQuery("findUserByEmail", User.class)
                             .setParameter("userEmail", user.getEmail())
                             .getSingleResult();
+            LOGGER.log(Level.INFO, "Code de verification after decrypting : {0}", user.getVerifcationCode());
+            String decryptedCode = ServerSideDecryption.decrypt(user.getVerifcationCode());
+            LOGGER.log(Level.INFO, "Code de verification after decrypting : {0}", decryptedCode);
 
-            if (dbUser.getVerifcationCode().equals(user.getVerifcationCode())) {
+            if (dbUser.getVerifcationCode().equals(decryptedCode)) {
                 dbUser.setVerifcationCode("");
                 super.edit(dbUser);
                 user.setActivo(true);
@@ -250,18 +230,19 @@ public class UserREST extends AbstractFacade<User> {
                             .setParameter("userEmail", user.getEmail())
                             .getSingleResult();
             if (existingUser != null) {
-                String encryptedBase64 = user.getPassword();
-                try {
-                    byte[] encryptedData = Base64.getDecoder().decode(encryptedBase64);
-                    decryptedPass = ServerSideDecryption.decrypt(encryptedData);
-                    System.out.println("Decrypted Message: " + decryptedPass);
-                } catch (Exception e) {
-                    LOGGER.log(Level.SEVERE, "Decryption failed", e);
-                }
+                LOGGER.log(Level.INFO, "Passord before decrypting : {0}", user.getPassword());
+
+                decryptedPass = ServerSideDecryption.decrypt(user.getPassword());
+                LOGGER.log(Level.INFO, "Passord after decrypting : {0}", decryptedPass);
+
                 existingUser.setPassword(HashMD5.hashText(decryptedPass));
+                LOGGER.log(Level.INFO, "Passord after hashing : {0}", HashMD5.hashText(decryptedPass));
+
                 super.edit(existingUser);
 
                 String[] credentials = symmetricDecrypt.descifrarCredenciales();
+                LOGGER.log(Level.INFO, "Email from dat file  : {0}", credentials[0]);
+                LOGGER.log(Level.INFO, "Passoword from dat file  : {0}", credentials[1]);
                 EmailSender.sendEmail(credentials[0], credentials[1], user.getEmail(), "", "changed");
             }
         } catch (Exception ex) {
