@@ -40,7 +40,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
 
     @POST
     @Consumes({MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Paquete createPackage(Paquete paquete) {
         try {
             LOGGER.log(Level.INFO, "Attempting to create package with name: {0}", paquete.getId());
@@ -74,7 +74,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
             return paquete;
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to update package with ID: " + id, e);
-            throw new InternalServerErrorException("Failed to update package" +e.getMessage());
+            throw new InternalServerErrorException("Failed to update package" + e.getMessage());
         }
     }
 
@@ -83,13 +83,22 @@ public class PackageREST extends AbstractFacade<Paquete> {
     public void deletePackage(@PathParam("id") Long id) {
         try {
             LOGGER.log(Level.INFO, "Attempting to delete package with ID: {0}", id);
+
             Paquete packageToDelete = super.find(id);
             if (packageToDelete == null) {
                 LOGGER.log(Level.WARNING, "Package not found for deletion with ID: {0}", id);
                 throw new NotFoundException("Package not found with ID: " + id);
             }
+
+            // Check if the package has an associated Envio
+            if (packageToDelete.getEnvio() != null) {
+                LOGGER.log(Level.WARNING, "This package has an Envio with ID: {0}", packageToDelete.getEnvio().getId());
+                packageToDelete.setEnvio(null);  // Detach Envio
+            }
+
             super.remove(packageToDelete);
             LOGGER.log(Level.INFO, "Successfully deleted package with ID: {0}", id);
+
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to delete package with ID: " + id, e);
             throw new InternalServerErrorException("Failed to delete package");
@@ -112,7 +121,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
 
     @GET
     @Path("size/{size}")
-    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Paquete> findPackagesBySize(@PathParam("size") PackageSize size) {
         try {
             LOGGER.log(Level.INFO, "Searching packages by size: {0}", size);
@@ -129,7 +138,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
 
     @GET
     @Path("name/{name}")
-    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Paquete> findPackagesByName(@PathParam("name") String name) {
         try {
             LOGGER.log(Level.INFO, "Searching packages by name: {0}", name);
@@ -146,7 +155,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
 
     @GET
     @Path("date/between")
-    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Paquete> findPackagesBetweenDates(
                     @QueryParam("startDate") @DefaultValue("") String startDate,
                     @QueryParam("endDate") @DefaultValue("") String endDate) {
@@ -177,7 +186,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
 
     @GET
     @Path("date/after")
-    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Paquete> findPackagesAfterDate(
                     @QueryParam("startDate") @DefaultValue("") String startDate) {
         try {
@@ -201,7 +210,7 @@ public class PackageREST extends AbstractFacade<Paquete> {
 
     @GET
     @Path("date/before")
-    @Produces({MediaType.APPLICATION_XML , MediaType.APPLICATION_JSON})
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Paquete> findPackagesBeforeDate(
                     @QueryParam("endDate") @DefaultValue("") String endDate) {
         try {
